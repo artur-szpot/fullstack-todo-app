@@ -1,0 +1,16 @@
+services:
+  backend:
+    ports:
+      - 3001:3001
+    depends_on:
+      - db
+
+  frontend:
+    ports:
+      - 3002:80
+
+  db:
+    ports:
+      - 5432:5432
+    environment:
+      - something=value

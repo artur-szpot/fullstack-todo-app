@@ -1,0 +1,4 @@
+INSERT users
+INSERT tags
+INSERT tasks
+INSERT tasks_tags
