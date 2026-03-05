@@ -1,16 +1,38 @@
 services:
   backend:
+    build:
+      context: backend
     ports:
       - 3001:3001
     depends_on:
       - db
 
   frontend:
+    build:
+      context: frontend
     ports:
       - 3002:80
 
   db:
+    image: postgres:17
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres-password
+      POSTGRES_USER_FILE: /run/secrets/postgres-superuser
+      POSTGRES_DB: todo_app
     ports:
       - 5432:5432
-    environment:
-      - something=value
+    volumes:
+      - db-volume:/var/lib/postgresql:rw
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    secrets:
+      - postgres-password
+      - postgres-superuser
+
+secrets:
+  postgres-password:
+    file: ./secrets/postgres-password.txt
+  postgres-superuser:
+    file: ./secrets/postgres-superuser.txt
+
+volumes:
+  db-volume:

@@ -1,6 +1,6 @@
-FROM node:22 as builder
+FROM node:22 AS builder
 
-COPY package.json package-lock.json .
+COPY package.json package-lock.json ./
 RUN npm ci && npm cache clean --force
 
 COPY . .
@@ -8,6 +8,6 @@ RUN npm run build
 
 FROM nginx
 
-COPY from=builder dist /usr/share/nginx/html
+COPY --from=builder build /usr/share/nginx/html/
 
 EXPOSE 80
