@@ -1,13 +1,13 @@
 FROM node:22
 
-WORKDIR /
-
-# ENV something
+RUN useradd -ms /bin/sh -u 1001 app
+USER app
+WORKDIR /app
 
 COPY package.json package-lock.json ./
 RUN npm ci
-COPY . .
+COPY --chown=app:app . .
 
 EXPOSE 3001
 
-CMD node main.js
+CMD npm run start:dev

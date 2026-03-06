@@ -1,5 +1,6 @@
 CREATE TABLE users (
    id VARCHAR(40) NOT NULL,
+   username TEXT UNIQUE NOT NULL,
    email TEXT UNIQUE NOT NULL,
    password TEXT NOT NULL,
    joined_date TIMESTAMP(6) NOT NULL DEFAULT(CURRENT_TIMESTAMP),
@@ -48,6 +49,12 @@ CREATE TABLE tasks (
 ALTER TABLE tasks 
    ADD CONSTRAINT tasks_pk 
    PRIMARY KEY (id);
+ALTER TABLE tasks 
+   ADD CONSTRAINT tasks_fk_created_by 
+   FOREIGN KEY(created_by) 
+   REFERENCES users(id)
+   ON DELETE CASCADE;
+
 
 CREATE TABLE tasks_tags (
    task_id VARCHAR(40) NOT NULL,
