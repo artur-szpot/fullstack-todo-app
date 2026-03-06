@@ -12,8 +12,9 @@
     "baseUrl": "./",
     "paths": {
       "@auth/*": ["src/auth/*"],
+      "@common/*": ["src/common/*"],
       "@db/*": ["src/db/*"],
-      "@domain/*": ["src/domain/*"],
+      "@domain/*": ["src/auth/domain/*"],
       "@dto/*": ["src/dto/*"],
       "@todo/*": ["src/todo/*"]
     },
