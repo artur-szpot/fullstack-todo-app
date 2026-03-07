@@ -1,8 +1,9 @@
-import { PermissionDto } from '@auth/dto/in/permission.dto';
-import { PermissionLevel } from '@auth/enums/permission-level.enum';
-import { PermissionType } from '@auth/enums/permission-type.enum';
 import { Entity } from '@common/Entity';
 import { EntityProps } from '@common/EntityProps';
+
+import { PermissionDto } from '../dto/in/permission.dto';
+import { PermissionLevel } from '../enums/permission-level.enum';
+import { PermissionType } from '../enums/permission-type.enum';
 
 export interface PermissionProps extends EntityProps {
   description: string;

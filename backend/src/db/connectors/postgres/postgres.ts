@@ -1,7 +1,8 @@
-import { User } from '@auth/domain/User';
 import { Injectable, Logger } from '@nestjs/common';
 import { Pool } from 'pg';
-import { UsersConnector } from 'src/db/interfaces/users.connector';
+
+import { User } from '@auth/domain/User';
+import { UsersConnector } from '@db/interfaces/users.connector';
 
 @Injectable()
 export class PostgresConnector implements UsersConnector {

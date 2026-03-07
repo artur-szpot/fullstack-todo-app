@@ -4,9 +4,9 @@ import { Reflector } from '@nestjs/core';
 import {
   PermissionDefinition,
   PERMISSIONS_KEY,
-} from '@auth/decorators/permissions.decorator';
-import { JwtDto } from '@auth/dto/in/jwt.dto';
-import { PermissionPrecedence } from '@auth/enums/permission-level.enum';
+} from '../decorators/permissions.decorator';
+import { JwtDto } from '../dto/in/jwt.dto';
+import { PermissionPrecedence } from '../enums/permission-level.enum';
 
 @Injectable()
 export class PermisionsGuard implements CanActivate {
@@ -17,7 +17,7 @@ export class PermisionsGuard implements CanActivate {
       PermissionDefinition[]
     >(PERMISSIONS_KEY, [context.getHandler(), context.getClass()]);
 
-    if (!requiredPermissions) {
+    if (!requiredPermissions.length) {
       return true;
     }
 

@@ -22,4 +22,12 @@ export class TodoController {
     const user = await this.dbConnector.getUserById('123-abc');
     return `This will return todo with ID ${id} (current user: ${user})`;
   }
+
+  // post to create a new one
+
+  // patch to update an existing one
+
+  // get all with pagination or other params
+
+  // delete to remove unwanted one
 }

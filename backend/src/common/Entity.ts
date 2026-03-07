@@ -1,4 +1,5 @@
 import { createId } from '@paralleldrive/cuid2';
+
 import { EntityProps } from './EntityProps';
 
 export abstract class Entity<P extends EntityProps> {

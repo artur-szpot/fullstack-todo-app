@@ -16,4 +16,30 @@ export class AuthController {
     );
     return this.authService.login(user);
   }
+
+  // post register
+
+  // whatever is needed for google or other oauth
+
+  // delete unwanted user (admin + self-deletion)
+
+  // get user
+
+  // get all users with pagination
+
+  // get role
+
+  // get all roles with pagination
+
+  // get permission
+
+  // get all permissions with pagination
+
+  // post new role
+
+  // delete existing role (make admin and user protected!)
+
+  // patch to change role permissions
+
+  // patch to change user roles
 }
