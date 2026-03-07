@@ -6,8 +6,7 @@ import {
   MaxLength,
   ValidateNested,
 } from 'class-validator';
-
-import { PermissionProps } from '@auth/domain/Permission';
+import { PermissionDto } from './permission.dto';
 
 export class RoleDto {
   @IsString()
@@ -26,5 +25,5 @@ export class RoleDto {
   @IsArray()
   @ArrayMinSize(1)
   @ValidateNested({ each: true })
-  permissions: PermissionProps[];
+  permissions: PermissionDto[];
 }

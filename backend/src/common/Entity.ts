@@ -1,22 +1,30 @@
 import { createId } from '@paralleldrive/cuid2';
+import * as t from 'io-ts';
+import { NonEmptyString } from 'io-ts-types';
 
-import { EntityProps } from './EntityProps';
+export const EntityProps = t.partial(
+  {
+    id: NonEmptyString,
+  },
+  'optionalEntityId',
+);
 
-export abstract class Entity<P extends EntityProps> {
+export abstract class Entity<P> {
   protected props: P;
 
-  constructor(props: Omit<P, 'id'> & Partial<Pick<P, 'id'>>) {
-    this.props = {
-      id: props.id ?? createId(),
-      ...props,
-    } as P;
+  protected abstract validateProps(input: unknown): P;
+
+  constructor(props: unknown) {
+    const validatedProps = {
+      id: createId(),
+      ...this.validateProps(props),
+    };
+    this.props = validatedProps;
   }
 
   public getProps(): P {
     return Object.freeze(this.props);
   }
 
-  public toString(): string {
-    return `Abstract Entity (ID ${this.props.id})`;
-  }
+  public abstract toString(): string;
 }

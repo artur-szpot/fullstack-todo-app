@@ -1,10 +1,31 @@
+import { PermissionDto } from '@auth/dto/in/permission.dto';
+import { IncorrectEntityProps } from '@common/incorrect-entity-props.error';
+
 import { PermissionLevel } from '../enums/permission-level.enum';
 import { PermissionType } from '../enums/permission-type.enum';
-import { Permission, PermissionProps } from './Permission';
+import { Permission, type PermissionPropsType } from './Permission';
 
 describe('Permission', () => {
-  it('should create an Entity based on correct props', async () => {
-    const props: PermissionProps = {
+  it('should create a Permission based on correct props without ID', async () => {
+    const props = {
+      description: 'text',
+      permissionType: PermissionType.TODOS,
+      permissionLevel: PermissionLevel.FULL,
+    };
+    const entity = new Permission(props);
+    expect(entity).toBeDefined();
+    expect(entity).toBeInstanceOf(Permission);
+    expect(entity.toString()).toEqual(
+      `Permission type: ${props.permissionType}, level: ${props.permissionLevel}"`,
+    );
+    expect(entity.getProps()).toEqual({
+      id: 'mocked-id',
+      ...props,
+    });
+  });
+
+  it('should create a Permission based on correct props with ID', async () => {
+    const props = {
       id: '1',
       description: 'text',
       permissionType: PermissionType.TODOS,
@@ -16,5 +37,54 @@ describe('Permission', () => {
     expect(entity.toString()).toEqual(
       `Permission type: ${props.permissionType}, level: ${props.permissionLevel}"`,
     );
+    expect(entity.getProps()).toEqual(props);
+  });
+
+  it('should create a Permission based on correct DTO', async () => {
+    const dto: PermissionDto = {
+      id: '1',
+      description: 'text',
+      permissionType: PermissionType.TODOS,
+      permissionLevel: PermissionLevel.FULL,
+    };
+    const entity = Permission.fromDto(dto);
+    expect(entity).toBeDefined();
+    expect(entity).toBeInstanceOf(Permission);
+    expect(entity.toString()).toEqual(
+      `Permission type: ${dto.permissionType}, level: ${dto.permissionLevel}"`,
+    );
+    expect(entity.getProps()).toEqual(dto);
+  });
+
+  it('should fail to create a Permission based on incorrect props', async () => {
+    const props = {
+      id: 1,
+      description: 'text',
+      permissionType: PermissionType.TODOS,
+      permissionLevel: PermissionLevel.FULL,
+    };
+    try {
+      const result = new Permission(props);
+      // Fail test if this doesn't throw
+      expect(true).toBe(false);
+    } catch (error) {
+      expect(error).toBeInstanceOf(IncorrectEntityProps);
+      expect(error.message).toContain('id: NonEmptyString');
+    }
+  });
+
+  it('should fail to create a Permission based on incomplete props', async () => {
+    const props = {
+      permissionType: PermissionType.TODOS,
+      permissionLevel: PermissionLevel.FULL,
+    };
+    try {
+      const result = new Permission(props);
+      // Fail test if this doesn't throw
+      expect(true).toBe(false);
+    } catch (error) {
+      expect(error).toBeInstanceOf(IncorrectEntityProps);
+      expect(error.message).toContain('description: NonEmptyString');
+    }
   });
 });
