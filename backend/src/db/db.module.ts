@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { PostgresConnector } from './connectors/postgres/postgres';
+import { PostgresConnector } from './connectors/postgres/connector';
 import { USERS_CONNECTOR } from './symbols';
 
 const userProvider = {

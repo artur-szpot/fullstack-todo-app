@@ -5,7 +5,7 @@ import { PermissionLevel } from '@auth/enums/permission-level.enum';
 import { PermissionType } from '@auth/enums/permission-type.enum';
 import { JwtAuthGuard } from '@auth/guards/jwt.guard';
 import { PermisionsGuard } from '@auth/guards/permissions.guard';
-import { UsersConnector } from '@db/interfaces/users.connector';
+import { UsersRepository } from '@db/repositories/users.repository';
 import { USERS_CONNECTOR } from '@db/symbols';
 
 @Controller('todo')
@@ -13,7 +13,7 @@ import { USERS_CONNECTOR } from '@db/symbols';
 export class TodoController {
   constructor(
     @Inject(USERS_CONNECTOR)
-    private readonly dbConnector: UsersConnector,
+    private readonly dbConnector: UsersRepository,
   ) {}
 
   @Get('/:id')
