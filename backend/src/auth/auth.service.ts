@@ -8,7 +8,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
-import { UsersRepository } from '@db/repositories/users.repository';
+import { UsersRepository } from '@db/repositories/user.repository';
 import { USERS_CONNECTOR } from '@db/symbols';
 
 import { User } from './domain/User';
