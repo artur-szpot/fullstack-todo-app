@@ -1,10 +1,10 @@
-import { RoleDto } from '@auth/dto/in/role.dto';
-import { PermissionLevel } from '@auth/enums/permission-level.enum';
-import { PermissionType } from '@auth/enums/permission-type.enum';
+import { Permission } from '@auth/modules/permissions/domain/Permission';
+import { PermissionLevel } from '@auth/modules/permissions/enums/permission-level.enum';
+import { PermissionType } from '@auth/modules/permissions/enums/permission-type.enum';
 import { IncorrectEntityProps } from '@common/incorrect-entity-props.error';
 
-import { Permission } from './Permission';
-import { Role, type RolePropsInputType } from './Role';
+import { RoleDto } from '../dto/in/role.dto';
+import { Role } from './Role';
 
 describe('Role', () => {
   it('should create a Role based on correct props without ID', async () => {

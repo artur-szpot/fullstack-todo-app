@@ -1,7 +1,7 @@
 import { IsEnum, IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
-import { PermissionLevel } from '@auth/enums/permission-level.enum';
-import { PermissionType } from '@auth/enums/permission-type.enum';
+import { PermissionLevel } from '../../enums/permission-level.enum';
+import { PermissionType } from '../../enums/permission-type.enum';
 
 export class PermissionDto {
   @IsString()

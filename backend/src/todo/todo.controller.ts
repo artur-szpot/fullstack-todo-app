@@ -1,11 +1,11 @@
 import { Controller, Get, Inject, Param, UseGuards } from '@nestjs/common';
 
 import { Permissions } from '@auth/decorators/permissions.decorator';
-import { PermissionLevel } from '@auth/enums/permission-level.enum';
-import { PermissionType } from '@auth/enums/permission-type.enum';
+import { PermissionLevel } from '@auth/modules/permissions/enums/permission-level.enum';
+import { PermissionType } from '@auth/modules/permissions/enums/permission-type.enum';
 import { JwtAuthGuard } from '@auth/guards/jwt.guard';
 import { PermisionsGuard } from '@auth/guards/permissions.guard';
-import { UsersRepository } from '@db/repositories/user.repository';
+import { UserRepository } from '@db/repositories/user.repository';
 import { USERS_CONNECTOR } from '@db/symbols';
 
 @Controller('todo')
@@ -13,7 +13,7 @@ import { USERS_CONNECTOR } from '@db/symbols';
 export class TodoController {
   constructor(
     @Inject(USERS_CONNECTOR)
-    private readonly dbConnector: UsersRepository,
+    private readonly dbConnector: UserRepository,
   ) {}
 
   @Get('/:id')

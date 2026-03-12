@@ -3,10 +3,14 @@ import * as t from 'io-ts';
 import { NonEmptyString } from 'io-ts-types';
 import { PathReporter } from 'io-ts/PathReporter';
 
-import { RoleDto } from '@auth/dto/in/role.dto';
+import {
+  Permission,
+  PermissionProps,
+} from '@auth/modules/permissions/domain/Permission';
 import { Entity, EntityProps } from '@common/Entity';
 import { IncorrectEntityProps } from '@common/incorrect-entity-props.error';
-import { Permission, PermissionProps } from './Permission';
+
+import { RoleDto } from '../dto/in/role.dto';
 
 export const RoleProps = t.intersection([
   EntityProps,

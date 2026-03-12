@@ -1,8 +1,8 @@
 import { ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
-import { PermissionLevel } from '../enums/permission-level.enum';
-import { PermissionType } from '../enums/permission-type.enum';
+import { PermissionLevel } from '../modules/permissions/enums/permission-level.enum';
+import { PermissionType } from '../modules/permissions/enums/permission-type.enum';
 import { PermisionsGuard } from './permissions.guard';
 
 describe('PermissionsGuard', () => {

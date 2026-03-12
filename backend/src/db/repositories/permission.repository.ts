@@ -1,9 +1,9 @@
-import { Permission } from '@auth/domain/Permission';
-import { PermissionType } from '@auth/enums/permission-type.enum';
+import { Permission } from '@auth/modules/permissions/domain/Permission';
+import { PermissionType } from '@auth/modules/permissions/enums/permission-type.enum';
 import { Pagination } from '@common/pagination';
 
 export interface PermissionRepository {
   getPermissionByType(permissionType: PermissionType): Promise<Permission>;
-  getAllPermissions(pagination?: Pagination): Promise<Permission[]>;
+  getManyPermissions(pagination?: Pagination): Promise<Permission[]>;
   getAllPermissionsCount(): Promise<number>;
 }

@@ -8,22 +8,23 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
-import { UsersRepository } from '@db/repositories/user.repository';
+import { UserRepository } from '@db/repositories/user.repository';
 import { USERS_CONNECTOR } from '@db/symbols';
 
-import { User } from './domain/User';
-import { JwtDto } from './dto/in/jwt.dto';
-import { LoginDto } from './dto/in/login.dto';
-import { LoginResponse } from './dto/out/login.response';
+import { User } from '../modules/users/domain/User';
+import { JwtDto } from '../dto/in/jwt.dto';
+import { LoginDto } from '../dto/in/login.dto';
+import { LoginResponse } from '../dto/out/login.response';
+import { AuthGateway } from './auth.gateway';
 
 @Injectable()
-export class AuthService {
+export class AuthService implements AuthGateway {
   private readonly logger = new Logger(AuthService.name);
 
   constructor(
     private readonly jwtService: JwtService,
     @Inject(USERS_CONNECTOR)
-    private readonly usersRepository: UsersRepository,
+    private readonly usersRepository: UserRepository,
   ) {}
 
   private async validateUser(

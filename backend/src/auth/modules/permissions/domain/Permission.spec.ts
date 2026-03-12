@@ -1,9 +1,9 @@
-import { PermissionDto } from '@auth/dto/in/permission.dto';
 import { IncorrectEntityProps } from '@common/incorrect-entity-props.error';
 
+import { PermissionDto } from '../dto/in/permission.dto';
 import { PermissionLevel } from '../enums/permission-level.enum';
 import { PermissionType } from '../enums/permission-type.enum';
-import { Permission, type PermissionPropsType } from './Permission';
+import { Permission } from './Permission';
 
 describe('Permission', () => {
   it('should create a Permission based on correct props without ID', async () => {

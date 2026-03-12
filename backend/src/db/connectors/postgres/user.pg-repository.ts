@@ -1,15 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
 
-import { User } from '@auth/domain/User';
-import { UserDto } from '@auth/dto/in/user.dto';
+import { User } from '@auth/modules/users/domain/User';
+import { UserDto } from '@auth/modules/users/dto/in/user.dto';
 import { Pagination } from '@common/pagination';
-import { DbSearchDto } from '@db/dto/search.dto';
 
-import { UsersRepository } from '../../repositories/user.repository';
+import { DbSearchDto } from '../../dto/search.dto';
+import { UserRepository } from '../../repositories/user.repository';
 import { PostgresConnector } from './connector';
 
 @Injectable()
-export class PostgresUserRepository implements UsersRepository {
+export class PostgresUserRepository implements UserRepository {
   private readonly logger = new Logger(PostgresUserRepository.name);
 
   private static SELECT_USERS_WHERE_PARTIAL_SQL = (
@@ -102,7 +102,7 @@ export class PostgresUserRepository implements UsersRepository {
     );
   }
 
-  private async getManyUsers(pagination?: Pagination): Promise<User[]> {
+  public async getManyUsers(pagination?: Pagination): Promise<User[]> {
     const connection = this.connector.getConnection();
     const resultRaw = await connection.query(
       PostgresUserRepository.SELECT_USERS_SQL({
@@ -116,10 +116,6 @@ export class PostgresUserRepository implements UsersRepository {
     const result = resultRaw.rows.map((row: UserDto) => User.fromDto(row));
     this.logger.debug(`Fetched ${result.length} results`);
     return result;
-  }
-
-  public async getAllUsers(pagination?: Pagination): Promise<User[]> {
-    return this.getManyUsers(pagination);
   }
 
   public async getAllUsersCount(): Promise<number> {

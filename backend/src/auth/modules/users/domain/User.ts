@@ -4,16 +4,16 @@ import { NonEmptyString } from 'io-ts-types';
 import { PathReporter } from 'io-ts/PathReporter';
 
 import { PermissionDefinition } from '@auth/decorators/permissions.decorator';
-import { UserDto } from '@auth/dto/in/user.dto';
 import {
   PermissionLevel,
   PermissionPrecedence,
-} from '@auth/enums/permission-level.enum';
-import { PermissionType } from '@auth/enums/permission-type.enum';
+} from '@auth/modules/permissions/enums/permission-level.enum';
+import { PermissionType } from '@auth/modules/permissions/enums/permission-type.enum';
+import { Role, RoleProps } from '@auth/modules/roles/domain/Role';
 import { Entity, EntityProps } from '@common/Entity';
 import { IncorrectEntityProps } from '@common/incorrect-entity-props.error';
 
-import { Role, RoleProps } from './Role';
+import { UserDto } from '../dto/in/user.dto';
 
 export const UserProps = t.intersection([
   EntityProps,

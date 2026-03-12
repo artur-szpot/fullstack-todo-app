@@ -1,10 +1,10 @@
-import { User } from '@auth/domain/User';
+import { User } from '@auth/modules/users/domain/User';
 import { Pagination } from '@common/pagination';
 
-export interface UsersRepository {
+export interface UserRepository {
   getUserById(userId: string): Promise<User | null>;
   getUserByUsername(username: string): Promise<User | null>;
-  getAllUsers(pagination?: Pagination): Promise<User[]>;
+  getManyUsers(pagination?: Pagination): Promise<User[]>;
   getAllUsersCount(): Promise<number>;
   // create user
   // update user

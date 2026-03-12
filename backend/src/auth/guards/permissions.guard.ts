@@ -6,7 +6,7 @@ import {
   PERMISSIONS_KEY,
 } from '../decorators/permissions.decorator';
 import { JwtDto } from '../dto/in/jwt.dto';
-import { PermissionPrecedence } from '../enums/permission-level.enum';
+import { PermissionPrecedence } from '../modules/permissions/enums/permission-level.enum';
 
 @Injectable()
 export class PermisionsGuard implements CanActivate {

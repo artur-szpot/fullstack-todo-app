@@ -1,18 +1,19 @@
-import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
-
-import { UsersRepository } from '@db/repositories/user.repository';
 import {
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
+
+import { User } from '@auth/modules/users/domain/User';
+import { UserRepository } from '@db/repositories/user.repository';
+
+import { LoginDto } from '../dto/in/login.dto';
 import { AuthService } from './auth.service';
-import { User } from './domain/User';
-import { LoginDto } from './dto/in/login.dto';
 
 describe('AuthService', () => {
   const mockJwtService: JwtService = jest.requireMock('@nestjs/jwt');
-  const mockUsersRepository: UsersRepository = jest.requireMock(
+  const mockUsersRepository: UserRepository = jest.requireMock(
     '@db/repositories/users.repository',
   );
   const service = new AuthService(mockJwtService, mockUsersRepository);

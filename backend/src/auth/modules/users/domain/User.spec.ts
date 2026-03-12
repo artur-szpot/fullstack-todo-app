@@ -1,9 +1,9 @@
-import { UserDto } from '@auth/dto/in/user.dto';
-import { PermissionLevel } from '@auth/enums/permission-level.enum';
-import { PermissionType } from '@auth/enums/permission-type.enum';
+import { PermissionLevel } from '@auth/modules/permissions/enums/permission-level.enum';
+import { PermissionType } from '@auth/modules/permissions/enums/permission-type.enum';
+import { Role } from '@auth/modules/roles/domain/Role';
 import { IncorrectEntityProps } from '@common/incorrect-entity-props.error';
 
-import { Role } from './Role';
+import { UserDto } from '../dto/in/user.dto';
 import { User } from './User';
 
 describe('User', () => {

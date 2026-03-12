@@ -1,17 +1,15 @@
-import { RoleProps } from '@auth/domain/Role';
 import {
   ArrayMinSize,
   IsArray,
-  IsEmail,
   IsNotEmpty,
-  IsOptional,
   IsString,
   MaxLength,
   ValidateNested,
 } from 'class-validator';
-import { RoleDto } from './role.dto';
 
-export class UserDto {
+import { PermissionDto } from '@auth/modules/permissions/dto/in/permission.dto';
+
+export class RoleDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(40)
@@ -19,20 +17,14 @@ export class UserDto {
 
   @IsString()
   @IsNotEmpty()
-  username: string;
+  name: string;
 
   @IsString()
   @IsNotEmpty()
-  @IsOptional()
-  password?: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @IsEmail()
-  email: string;
+  description: string;
 
   @IsArray()
   @ArrayMinSize(1)
   @ValidateNested({ each: true })
-  roles: RoleDto[];
+  permissions: PermissionDto[];
 }
