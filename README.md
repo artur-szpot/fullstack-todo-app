@@ -1,6 +1,6 @@
 # fullstack-todo-app
 
-An application to keep track of pending tasks, utilizing Express.js, React.js, PostgreSQL and Docker
+An application to keep track of pending tasks, utilizing Nest.js, React.js, PostgreSQL and Docker
 
 # Features
 
@@ -39,8 +39,7 @@ TODO: Detailed instructions on how to set it up.
 This is a work in progress. A lot is left to be done still.
 
 - Full READMEs
-- Whole backend
+- Much of backend (see backend/README.md)
 - Whole frontend
-- DB scripts
-- Initial test data
+- DB: potential changes to data structure, more test data to seed
 - Docker instructions

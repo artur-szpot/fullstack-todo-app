@@ -6,7 +6,6 @@ import { PathReporter } from 'io-ts/PathReporter';
 import { Entity, EntityProps } from '@common/Entity';
 import { IncorrectEntityProps } from '@common/incorrect-entity-props.error';
 
-import { PermissionDto } from '../dto/in/permission.dto';
 import { PermissionLevel } from '../enums/permission-level.enum';
 import { PermissionType } from '../enums/permission-type.enum';
 
@@ -19,13 +18,18 @@ export const PermissionProps = t.intersection([
         t.literal(PermissionType.TODOS),
         t.literal(PermissionType.USERS),
       ]),
+    },
+    'requiredPermissionProps',
+  ),
+  t.partial(
+    {
       permissionLevel: t.union([
         t.literal(PermissionLevel.READ),
         t.literal(PermissionLevel.CREATE),
         t.literal(PermissionLevel.FULL),
       ]),
     },
-    'requiredPermissionProps',
+    'optionalPermissionProps',
   ),
 ]);
 
@@ -41,16 +45,10 @@ export class Permission extends Entity<PermissionPropsType> {
     return decodeProps;
   }
 
-  static fromDto(dto: PermissionDto) {
-    return new Permission({
-      id: dto.id,
-      description: dto.description,
-      permissionType: dto.permissionType,
-      permissionLevel: dto.permissionLevel,
-    });
-  }
-
   public toString(): string {
-    return `Permission type: ${this.props.permissionType}, level: ${this.props.permissionLevel}"`;
+    if (this.props.permissionLevel) {
+      return `Permission type: ${this.props.permissionType}, level: ${this.props.permissionLevel}`;
+    }
+    return `Permission type: ${this.props.permissionType}`;
   }
 }

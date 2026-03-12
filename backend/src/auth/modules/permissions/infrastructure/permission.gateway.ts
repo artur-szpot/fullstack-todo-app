@@ -1,9 +1,10 @@
 import { Pagination } from '@common/pagination';
 
-import { Permission } from '../domain/Permission';
+import { Paginated } from '@common/Paginated';
+import { PermissionResponse } from '../dto/out/permission.response';
 import { PermissionType } from '../enums/permission-type.enum';
 
 export interface PermissionGateway {
-  getByType(permissionType: PermissionType): Promise<Permission>;
-  getMany(pagination?: Pagination): Promise<Permission[]>;
+  getByType(permissionType: PermissionType): Promise<PermissionResponse>;
+  getMany(pagination?: Pagination): Promise<Paginated<PermissionResponse>>;
 }

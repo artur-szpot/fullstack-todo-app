@@ -3,6 +3,7 @@ import { IncorrectEntityProps } from '@common/incorrect-entity-props.error';
 import { PermissionDto } from '../dto/in/permission.dto';
 import { PermissionLevel } from '../enums/permission-level.enum';
 import { PermissionType } from '../enums/permission-type.enum';
+import { permissionMapper } from '../mappers/permission.mapper';
 import { Permission } from './Permission';
 
 describe('Permission', () => {
@@ -16,7 +17,7 @@ describe('Permission', () => {
     expect(entity).toBeDefined();
     expect(entity).toBeInstanceOf(Permission);
     expect(entity.toString()).toEqual(
-      `Permission type: ${props.permissionType}, level: ${props.permissionLevel}"`,
+      `Permission type: ${props.permissionType}, level: ${props.permissionLevel}`,
     );
     expect(entity.getProps()).toEqual({
       id: 'mocked-id',
@@ -35,7 +36,7 @@ describe('Permission', () => {
     expect(entity).toBeDefined();
     expect(entity).toBeInstanceOf(Permission);
     expect(entity.toString()).toEqual(
-      `Permission type: ${props.permissionType}, level: ${props.permissionLevel}"`,
+      `Permission type: ${props.permissionType}, level: ${props.permissionLevel}`,
     );
     expect(entity.getProps()).toEqual(props);
   });
@@ -47,12 +48,25 @@ describe('Permission', () => {
       permissionType: PermissionType.TODOS,
       permissionLevel: PermissionLevel.FULL,
     };
-    const entity = Permission.fromDto(dto);
+    const entity = permissionMapper.fromDto.toDomain(dto);
     expect(entity).toBeDefined();
     expect(entity).toBeInstanceOf(Permission);
     expect(entity.toString()).toEqual(
-      `Permission type: ${dto.permissionType}, level: ${dto.permissionLevel}"`,
+      `Permission type: ${dto.permissionType}, level: ${dto.permissionLevel}`,
     );
+    expect(entity.getProps()).toEqual(dto);
+  });
+
+  it('should create a Permission based on correct DTO without level', async () => {
+    const dto: PermissionDto = {
+      id: '1',
+      description: 'text',
+      permissionType: PermissionType.TODOS,
+    };
+    const entity = permissionMapper.fromDto.toDomain(dto);
+    expect(entity).toBeDefined();
+    expect(entity).toBeInstanceOf(Permission);
+    expect(entity.toString()).toEqual(`Permission type: ${dto.permissionType}`);
     expect(entity.getProps()).toEqual(dto);
   });
 

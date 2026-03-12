@@ -1,4 +1,10 @@
-import { IsEnum, IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 
 import { PermissionLevel } from '../../enums/permission-level.enum';
 import { PermissionType } from '../../enums/permission-type.enum';
@@ -19,5 +25,6 @@ export class PermissionDto {
 
   @IsEnum(PermissionLevel)
   @IsNotEmpty()
-  permissionLevel: PermissionLevel;
+  @IsOptional()
+  permissionLevel?: PermissionLevel;
 }
