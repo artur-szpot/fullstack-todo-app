@@ -1,7 +1,9 @@
 CREATE TYPE permission_type 
    AS ENUM (
       'TODOS',
-      'USERS'
+      'USERS',
+      'ROLES',
+      'PERMISSIONS'
    );
 
 CREATE TABLE permissions (

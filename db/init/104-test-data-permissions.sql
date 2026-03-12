@@ -11,4 +11,12 @@ VALUES (
    'todo-permission-users',
    'Allows the user to interact with users',
    'USERS'
+), (
+   'todo-permission-roles',
+   'Allows the user to interact with roles',
+   'ROLES'
+), (
+   'todo-permission-permissions',
+   'Allows the user to interact with permissions',
+   'PERMISSIONS'
 );
