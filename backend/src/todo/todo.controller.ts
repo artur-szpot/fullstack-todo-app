@@ -1,6 +1,6 @@
 import { Controller, Get, Inject, Param, UseGuards } from '@nestjs/common';
 
-import { Permissions } from '@auth/decorators/permissions.decorator';
+import { RequirePermissions } from '@auth/decorators/permissions.decorator';
 import { JwtAuthGuard } from '@auth/guards/jwt.guard';
 import { PermisionsGuard } from '@auth/guards/permissions.guard';
 import { PermissionLevel } from '@auth/modules/permissions/enums/permission-level.enum';
@@ -19,7 +19,7 @@ export class TodoController {
   ) {}
 
   @Get('/:id')
-  @Permissions([PermissionType.TODOS, PermissionLevel.READ])
+  @RequirePermissions([PermissionType.TODOS, PermissionLevel.READ])
   public async getTodo(@Param('id') id: number): Promise<string> {
     const user = await this.dbConnector.getUserById('123-abc');
     return `This will return todo with ID ${id} (current user: ${user})`;

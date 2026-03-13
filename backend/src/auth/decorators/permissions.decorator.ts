@@ -5,5 +5,5 @@ import { PermissionType } from '@auth/modules/permissions/enums/permission-type.
 
 export const PERMISSIONS_KEY = 'permissions';
 export type PermissionDefinition = [PermissionType, PermissionLevel];
-export const Permissions = (...permissions: PermissionDefinition[]) =>
+export const RequirePermissions = (...permissions: PermissionDefinition[]) =>
   SetMetadata(PERMISSIONS_KEY, permissions);

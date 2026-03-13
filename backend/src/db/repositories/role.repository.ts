@@ -1,14 +1,16 @@
-import { Role } from '@auth/modules/roles/domain/Role';
-import { Pagination } from '@common/pagination';
+import { CreateRoleDto } from '@auth/modules/roles/dto/in/create-role.dto';
+import { RoleDto } from '@auth/modules/roles/dto/in/role.dto';
+import { UpdateRoleDto } from '@auth/modules/roles/dto/in/update-role.dto';
+import { Pagination } from '@common/pagination/pagination';
 
 export interface RoleRepository {
-  getRoleById(roleId: string): Promise<Role | null>;
-  getRoleByName(roleName: string): Promise<Role | null>;
-  getManyRoles(pagination?: Pagination): Promise<Role[]>;
+  getRoleById(roleId: string): Promise<RoleDto | null>;
+  getRoleByName(roleName: string): Promise<RoleDto | null>;
+  getManyRoles(pagination?: Pagination): Promise<RoleDto[]>;
   getAllRolesCount(): Promise<number>;
-  // create role
-  // update role
-  // delete role
+  createRole(input: CreateRoleDto): Promise<RoleDto>;
+  updateRole(roleId: string, input: UpdateRoleDto): Promise<RoleDto>;
+  deleteRole(roleId: string): Promise<RoleDto>;
 }
 
 export const ROLE_REPOSITORY = Symbol('ROLE_REPOSITORY');

@@ -1,12 +1,12 @@
-import { Permission } from '@auth/modules/permissions/domain/Permission';
+import { PermissionDto } from '@auth/modules/permissions/dto/in/permission.dto';
 import { PermissionType } from '@auth/modules/permissions/enums/permission-type.enum';
-import { Pagination } from '@common/pagination';
+import { Pagination } from '@common/pagination/pagination';
 
 export interface PermissionRepository {
   getPermissionByType(
     permissionType: PermissionType,
-  ): Promise<Permission | null>;
-  getManyPermissions(pagination?: Pagination): Promise<Permission[]>;
+  ): Promise<PermissionDto | null>;
+  getManyPermissions(pagination?: Pagination): Promise<PermissionDto[]>;
   getAllPermissionsCount(): Promise<number>;
 }
 

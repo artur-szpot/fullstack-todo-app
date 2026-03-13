@@ -1,6 +1,7 @@
 import {
   ArrayMinSize,
   IsArray,
+  IsBoolean,
   IsNotEmpty,
   IsString,
   MaxLength,
@@ -22,6 +23,10 @@ export class RoleDto {
   @IsString()
   @IsNotEmpty()
   description: string;
+
+  @IsBoolean()
+  @IsNotEmpty()
+  protectedRole: boolean;
 
   @IsArray()
   @ArrayMinSize(1)

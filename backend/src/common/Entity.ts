@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { createId } from '@paralleldrive/cuid2';
 import * as t from 'io-ts';
 import { NonEmptyString } from 'io-ts-types';
@@ -12,12 +13,12 @@ export const EntityProps = t.partial(
 export abstract class Entity<P> {
   protected props: P;
 
-  protected abstract validateProps(input: unknown): P;
+  protected abstract validateProps(logger: Logger, input: unknown): P;
 
-  constructor(props: unknown) {
+  constructor(logger: Logger, props: unknown) {
     const validatedProps = {
       id: createId(),
-      ...this.validateProps(props),
+      ...this.validateProps(logger, props),
     };
     this.props = validatedProps;
   }

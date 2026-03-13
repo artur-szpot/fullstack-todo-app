@@ -1,4 +1,4 @@
-import { PostgresConnector } from './connector';
+import { PostgresConnector } from './PostgresConnector';
 
 const normalizeSQL = (input: string): string =>
   input.replace(/\n/g, ' ').replace(/\s\s+/g, ' ').trim();

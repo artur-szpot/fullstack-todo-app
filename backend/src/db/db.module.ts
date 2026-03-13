@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 
-import { PostgresConnector } from './connectors/postgres/connector';
+import { PostgresConnector } from './connectors/postgres/PostgresConnector';
 import { PostgresPermissionRepository } from './connectors/postgres/permission.pg-repository';
 import { PostgresRoleRepository } from './connectors/postgres/role.pg-repository';
 import { PostgresUserRepository } from './connectors/postgres/user.pg-repository';

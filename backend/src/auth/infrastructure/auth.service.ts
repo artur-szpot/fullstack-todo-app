@@ -13,6 +13,7 @@ import {
   UserRepository,
 } from '@db/repositories/user.repository';
 
+import { userMapper } from '@auth/modules/users/mappers/user.mapper';
 import { JwtDto } from '../dto/in/jwt.dto';
 import { LoginDto } from '../dto/in/login.dto';
 import { LoginResponse } from '../dto/out/login.response';
@@ -33,7 +34,7 @@ export class AuthService implements AuthGateway {
     username: string,
     password: string,
   ): Promise<User | null> {
-    const user = await (async (_username) => {
+    const userDto = await (async (_username) => {
       try {
         return await this.usersRepository.getUserByUsername(_username);
       } catch (error) {
@@ -41,9 +42,16 @@ export class AuthService implements AuthGateway {
         throw new InternalServerErrorException('Failed to validate user');
       }
     })(username);
-    if (user && (await bcrypt.compare(password, user.getProps().password))) {
-      user.sanitize();
-      return user;
+    if (userDto) {
+      const user = userMapper.fromDto.toDomain(userDto);
+      const correctPassword = await bcrypt.compare(
+        password,
+        user.getProps().password,
+      );
+      if (correctPassword) {
+        user.sanitize();
+        return user;
+      }
     }
     throw new UnauthorizedException('Invalid login credentials.');
   }

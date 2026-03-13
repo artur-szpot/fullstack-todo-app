@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { isLeft } from 'fp-ts/lib/Either';
 import * as t from 'io-ts';
 import { NonEmptyString } from 'io-ts-types';
@@ -10,8 +11,6 @@ import {
 import { Entity, EntityProps } from '@common/Entity';
 import { IncorrectEntityProps } from '@common/incorrect-entity-props.error';
 
-import { RoleDto } from '../dto/in/role.dto';
-
 export const RoleProps = t.intersection([
   EntityProps,
   t.type(
@@ -19,6 +18,7 @@ export const RoleProps = t.intersection([
       name: NonEmptyString,
       description: NonEmptyString,
       permissions: t.array(PermissionProps),
+      protectedRole: t.boolean,
     },
     'requiredRoleProps',
   ),
@@ -31,27 +31,19 @@ export type RolePropsType = Omit<RolePropsInputType, 'permissions'> & {
 };
 
 export class Role extends Entity<RolePropsType> {
-  protected validateProps(input: unknown): RolePropsType {
+  protected validateProps(logger: Logger, input: unknown): RolePropsType {
     const decoded = RoleProps.decode(input);
     if (isLeft(decoded)) {
+      logger.error(`Incorrect props received: ${JSON.stringify(input)}`);
       throw new IncorrectEntityProps(PathReporter.report(decoded).join('\n'));
     }
     const decodedProps: RolePropsInputType = decoded.right;
     return {
       ...decodedProps,
       permissions: decodedProps.permissions.map(
-        (permission) => new Permission(permission),
+        (permission) => new Permission(logger, permission),
       ),
     };
-  }
-
-  static fromDto(dto: RoleDto) {
-    return new Role({
-      id: dto.id,
-      name: dto.name,
-      description: dto.description,
-      permissions: dto.permissions,
-    });
   }
 
   public toString(): string {

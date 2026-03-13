@@ -1,14 +1,17 @@
 INSERT INTO roles(
    id,
    name,
-   description
+   description,
+   protected
 )
 VALUES (
    'todo-role-admin',
    'Admin',
-   'Grants administrative access to the application'
+   'Grants administrative access to the application',
+   true
 ), (
    'todo-role-user',
    'User',
-   'Grants access to the main functionality of the application'
+   'Grants access to the main functionality of the application',
+   true
 );

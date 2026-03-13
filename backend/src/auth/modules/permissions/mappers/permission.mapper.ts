@@ -1,12 +1,14 @@
+import { Logger } from '@nestjs/common';
 import { Permission } from '../domain/Permission';
 import { PermissionDto } from '../dto/in/permission.dto';
 import { PermissionResponse } from '../dto/out/permission.response';
 
+const logger = new Logger('PermissionMapper');
+
 export const permissionMapper = {
   fromDto: {
     toDomain: (dto: PermissionDto): Permission => {
-      return new Permission({
-        id: dto.id,
+      return new Permission(logger, {
         description: dto.description,
         permissionType: dto.permissionType,
         permissionLevel: dto.permissionLevel,
@@ -15,11 +17,12 @@ export const permissionMapper = {
   },
   fromDomain: {
     toResponse: (permission: Permission): PermissionResponse => {
-      const { id, description, permissionType } = permission.getProps();
+      const { description, permissionType, permissionLevel } =
+        permission.getProps();
       return {
-        id,
         description,
         permissionType,
+        permissionLevel,
       };
     },
   },

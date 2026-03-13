@@ -12,11 +12,6 @@ import { PermissionType } from '../../enums/permission-type.enum';
 export class PermissionDto {
   @IsString()
   @IsNotEmpty()
-  @MaxLength(40)
-  id: string;
-
-  @IsString()
-  @IsNotEmpty()
   description: string;
 
   @IsEnum(PermissionType)

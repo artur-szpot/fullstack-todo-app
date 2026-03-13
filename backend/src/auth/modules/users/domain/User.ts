@@ -13,6 +13,7 @@ import { Role, RoleProps } from '@auth/modules/roles/domain/Role';
 import { Entity, EntityProps } from '@common/Entity';
 import { IncorrectEntityProps } from '@common/incorrect-entity-props.error';
 
+import { Logger } from '@nestjs/common';
 import { UserDto } from '../dto/in/user.dto';
 
 export const UserProps = t.intersection([
@@ -40,7 +41,7 @@ export type UserPropsType = Omit<UserPropsInputType, 'roles'> & {
 };
 
 export class User extends Entity<UserPropsType> {
-  protected validateProps(input: unknown): UserPropsType {
+  protected validateProps(logger: Logger, input: unknown): UserPropsType {
     const decoded = UserProps.decode(input);
     if (isLeft(decoded)) {
       throw new IncorrectEntityProps(PathReporter.report(decoded).join('\n'));
@@ -48,18 +49,8 @@ export class User extends Entity<UserPropsType> {
     const decodedProps: UserPropsInputType = decoded.right;
     return {
       ...decodedProps,
-      roles: decodedProps.roles.map((role) => new Role(role)),
+      roles: decodedProps.roles.map((role) => new Role(logger, role)),
     };
-  }
-
-  static fromDto(dto: UserDto) {
-    return new User({
-      id: dto.id,
-      email: dto.email,
-      username: dto.username,
-      password: dto.password,
-      roles: dto.roles,
-    });
   }
 
   public toString(): string {

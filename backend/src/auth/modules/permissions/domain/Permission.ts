@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { isLeft } from 'fp-ts/lib/Either';
 import * as t from 'io-ts';
 import { NonEmptyString } from 'io-ts-types';
@@ -17,6 +18,8 @@ export const PermissionProps = t.intersection([
       permissionType: t.union([
         t.literal(PermissionType.TODOS),
         t.literal(PermissionType.USERS),
+        t.literal(PermissionType.ROLES),
+        t.literal(PermissionType.PERMISSIONS),
       ]),
     },
     'requiredPermissionProps',
@@ -36,9 +39,10 @@ export const PermissionProps = t.intersection([
 export type PermissionPropsType = t.TypeOf<typeof PermissionProps>;
 
 export class Permission extends Entity<PermissionPropsType> {
-  protected validateProps(input: unknown): PermissionPropsType {
+  protected validateProps(logger: Logger, input: unknown): PermissionPropsType {
     const decoded = PermissionProps.decode(input);
     if (isLeft(decoded)) {
+      logger.error(`Incorrect props received: ${JSON.stringify(input)}`);
       throw new IncorrectEntityProps(PathReporter.report(decoded).join('\n'));
     }
     const decodeProps: PermissionPropsType = decoded.right;

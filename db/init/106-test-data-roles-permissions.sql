@@ -1,22 +1,22 @@
 INSERT INTO roles_permissions(
    role_id,
-   permission_id,
+   permission_type,
    permission_level
 )
 VALUES (
    'todo-role-admin',
-   'todo-permission-users',
+   'USERS',
    'FULL'
 ), (
    'todo-role-admin',
-   'todo-permission-roles',
+   'ROLES',
    'FULL'
 ), (
    'todo-role-admin',
-   'todo-permission-permissions',
+   'PERMISSIONS',
    'FULL'
 ), (
    'todo-role-user',
-   'todo-permission-todos',
+   'TODOS',
    'FULL'
 );

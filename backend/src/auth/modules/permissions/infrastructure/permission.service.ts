@@ -1,12 +1,8 @@
-import {
-  Inject,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 
-import { Paginated } from '@common/Paginated';
-import { Pagination } from '@common/pagination';
+import { InternalError, NotFoundError } from '@common/errors/service-errors';
+import { Paginated } from '@common/pagination/Paginated';
+import { Pagination } from '@common/pagination/pagination';
 import {
   PERMISSION_REPOSITORY,
   PermissionRepository,
@@ -19,6 +15,8 @@ import { PermissionGateway } from './permission.gateway';
 
 @Injectable()
 export class PermissionService implements PermissionGateway {
+  private readonly logger = new Logger(PermissionService.name);
+
   constructor(
     @Inject(PERMISSION_REPOSITORY)
     private readonly permissionRepository: PermissionRepository,
@@ -28,18 +26,18 @@ export class PermissionService implements PermissionGateway {
     permissionType: PermissionType,
   ): Promise<PermissionResponse> {
     try {
-      const permission =
+      const permissionDto =
         await this.permissionRepository.getPermissionByType(permissionType);
-      if (!permission) {
-        throw new NotFoundException(
-          `Could not retrieve permission of type ${permissionType}`,
-        );
+      if (!permissionDto) {
+        throw new NotFoundError(`permission of type ${permissionType}`);
       }
+      const permission = permissionMapper.fromDto.toDomain(permissionDto);
       return permissionMapper.fromDomain.toResponse(permission);
     } catch (error) {
-      throw new InternalServerErrorException(
-        `Unexpected error occurred while retrieving the permission`,
+      this.logger.error(
+        `Unexpected error while retrieving permission with type "${permissionType}": ${error}`,
       );
+      throw new InternalError('retrieving the permission');
     }
   }
 
@@ -49,12 +47,17 @@ export class PermissionService implements PermissionGateway {
     try {
       const items =
         await this.permissionRepository.getManyPermissions(pagination);
+      const permissions = items.map(permissionMapper.fromDto.toDomain);
       const total = await this.permissionRepository.getAllPermissionsCount();
-      return { page: items.map(permissionMapper.fromDomain.toResponse), total };
+      return {
+        page: permissions.map(permissionMapper.fromDomain.toResponse),
+        total,
+      };
     } catch (error) {
-      throw new InternalServerErrorException(
-        `Unexpected error occurred while retrieving permissions`,
+      this.logger.error(
+        `Unexpected error while retrieving permissions: ${error}`,
       );
+      throw new InternalError('retrieving permissions');
     }
   }
 }

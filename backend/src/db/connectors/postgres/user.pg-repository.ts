@@ -1,17 +1,14 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
-import { User } from '@auth/modules/users/domain/User';
 import { UserDto } from '@auth/modules/users/dto/in/user.dto';
-import { Pagination } from '@common/pagination';
+import { Pagination } from '@common/pagination/pagination';
 
 import { DbSearchDto } from '../../dto/search.dto';
 import { UserRepository } from '../../repositories/user.repository';
-import { PostgresConnector } from './connector';
+import { PostgresConnector } from './PostgresConnector';
 
 @Injectable()
 export class PostgresUserRepository implements UserRepository {
-  private readonly logger = new Logger(PostgresUserRepository.name);
-
   private SELECT_USERS_WHERE_PARTIAL_SQL = (args?: DbSearchDto): string => {
     return `(
      SELECT 
@@ -35,6 +32,7 @@ export class PostgresUserRepository implements UserRepository {
             'id', r.id,
             'name', r.name,
             'description', r.description,
+            'protectedRole', r.protected,
             'permissions', role_permissions_helper.permissions
          )
       ) AS roles
@@ -48,7 +46,6 @@ export class PostgresUserRepository implements UserRepository {
          rp.role_id,
          json_agg(
             json_build_object(
-               'id', p.id,
                'description', p.description,
                'permissionType', p.type,
                'permissionLevel', rp.permission_level
@@ -56,65 +53,41 @@ export class PostgresUserRepository implements UserRepository {
          ) AS permissions
       FROM roles_permissions rp
       JOIN permissions p 
-         ON rp.permission_id = p.id
+         ON rp.permission_type = p.type
       GROUP BY rp.role_id
    ) role_permissions_helper 
       ON role_permissions_helper.role_id = r.id
    GROUP BY u.id, u.username, u.password, u.email;
   `;
 
-  private SELECT_USERS_COUNT_SQL = (): string =>
-    `SELECT COUNT(*) AS total FROM users;`;
+  private SELECT_USERS_COUNT_SQL: string = `SELECT COUNT(*) AS total FROM users;`;
 
   constructor(private readonly connector: PostgresConnector) {}
 
-  private async getSingleUser(query: string): Promise<User | null> {
-    const connection = this.connector.getConnection();
-    const resultRaw = await connection.query(query);
-    if (!resultRaw?.rows?.[0]) {
-      return null;
-    }
-    const result = User.fromDto(resultRaw?.rows?.[0]);
-    this.logger.debug(`Fetched ${result}`);
-    return result;
-  }
-
-  public async getUserById(userId: string): Promise<User | null> {
-    return this.getSingleUser(
+  public async getUserById(userId: string): Promise<UserDto | null> {
+    return this.connector.getOne<UserDto>(
       this.SELECT_USERS_SQL({ where: `id = '${userId}'` }),
     );
   }
 
-  public async getUserByUsername(username: string): Promise<User | null> {
-    return this.getSingleUser(
+  public async getUserByUsername(username: string): Promise<UserDto | null> {
+    return this.connector.getOne<UserDto>(
       this.SELECT_USERS_SQL({
         where: `username = '${username}'`,
       }),
     );
   }
 
-  public async getManyUsers(pagination?: Pagination): Promise<User[]> {
-    const connection = this.connector.getConnection();
-    const resultRaw = await connection.query(
+  public async getManyUsers(pagination?: Pagination): Promise<UserDto[]> {
+    return this.connector.getMany<UserDto>(
       this.SELECT_USERS_SQL({
         orderBy: 'username ASC',
         pagination,
       }),
     );
-    if (!resultRaw?.rows?.length) {
-      return [];
-    }
-    const result = resultRaw.rows.map((row: UserDto) => User.fromDto(row));
-    this.logger.debug(`Fetched ${result.length} results`);
-    return result;
   }
 
   public async getAllUsersCount(): Promise<number> {
-    const connection = this.connector.getConnection();
-    const resultRaw = await connection.query(this.SELECT_USERS_COUNT_SQL);
-    if (!resultRaw?.rows?.[0]) {
-      return 0;
-    }
-    return resultRaw.rows[0].total;
+    return this.connector.getCount(this.SELECT_USERS_COUNT_SQL);
   }
 }

@@ -1,10 +1,20 @@
-import { Controller, Get, Inject, Param, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Inject,
+  Param,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 
-import { Permissions } from '@auth/decorators/permissions.decorator';
+import { RequirePermissions } from '@auth/decorators/permissions.decorator';
 import { JwtAuthGuard } from '@auth/guards/jwt.guard';
 import { PermisionsGuard } from '@auth/guards/permissions.guard';
-import { Paginated } from '@common/Paginated';
+import { Paginated } from '@common/pagination/Paginated';
+import { PaginationDto } from '@common/pagination/dto/in/pagination.dto';
+import { paginationMapper } from '@common/pagination/mapper/pagination.mapper';
 
+import { GetPermissionByTypeDto } from './dto/in/get-permission-by-type.dto';
 import { PermissionResponse } from './dto/out/permission.response';
 import { PermissionLevel } from './enums/permission-level.enum';
 import { PermissionType } from './enums/permission-type.enum';
@@ -21,20 +31,20 @@ export class PermissionController {
     private readonly gateway: PermissionGateway,
   ) {}
 
-  @Get('/:type')
-  @Permissions([PermissionType.PERMISSIONS, PermissionLevel.READ])
+  @Get('/:permissionType')
+  @RequirePermissions([PermissionType.PERMISSIONS, PermissionLevel.READ])
   async getPermissionByType(
-    @Param('type') permissionType: PermissionType,
+    @Param() params: GetPermissionByTypeDto,
   ): Promise<PermissionResponse> {
+    const { permissionType } = params;
     return this.gateway.getByType(permissionType);
   }
 
   @Get('/')
-  @Permissions([PermissionType.PERMISSIONS, PermissionLevel.READ])
+  @RequirePermissions([PermissionType.PERMISSIONS, PermissionLevel.READ])
   async getPermissions(
-    @Param('pageSize') pageSize?: number,
-    @Param('pageNumber') pageNumber?: number,
+    @Query() pagination: PaginationDto,
   ): Promise<Paginated<PermissionResponse>> {
-    return this.gateway.getMany({ pageNumber, pageSize });
+    return this.gateway.getMany(paginationMapper.fromDto(pagination));
   }
 }

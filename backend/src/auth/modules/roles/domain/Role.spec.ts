@@ -4,6 +4,7 @@ import { PermissionType } from '@auth/modules/permissions/enums/permission-type.
 import { IncorrectEntityProps } from '@common/incorrect-entity-props.error';
 
 import { RoleDto } from '../dto/in/role.dto';
+import { roleMapper } from '../mappers/role.mapper';
 import { Role } from './Role';
 
 describe('Role', () => {
@@ -11,6 +12,7 @@ describe('Role', () => {
     const props = {
       description: 'text',
       name: 'test',
+      protectedRole: false,
       permissions: [
         {
           id: '1',
@@ -38,6 +40,7 @@ describe('Role', () => {
       id: '1',
       description: 'text',
       name: 'test',
+      protectedRole: false,
       permissions: [
         {
           id: '2',
@@ -64,6 +67,7 @@ describe('Role', () => {
       id: '1',
       description: 'text',
       name: 'test',
+      protectedRole: false,
       permissions: [
         {
           id: '2',
@@ -73,7 +77,7 @@ describe('Role', () => {
         },
       ],
     };
-    const entity = Role.fromDto(dto);
+    const entity = roleMapper.fromDto.toDomain(dto);
     expect(entity).toBeDefined();
     expect(entity).toBeInstanceOf(Role);
     expect(entity.toString()).toEqual(`Role "${dto.name}"`);
@@ -90,6 +94,7 @@ describe('Role', () => {
       id: 1,
       description: 'text',
       name: 'test',
+      protectedRole: false,
       permissions: [
         {
           id: '2',
@@ -100,7 +105,7 @@ describe('Role', () => {
       ],
     };
     try {
-      const result = new Role(props);
+      new Role(props);
       // Fail test if this doesn't throw
       expect(true).toBe(false);
     } catch (error) {
@@ -112,6 +117,7 @@ describe('Role', () => {
   it('should fail to create a Role based on incomplete props', async () => {
     const props = {
       name: 'test',
+      protectedRole: false,
       permissions: [
         {
           id: '2',
@@ -122,7 +128,7 @@ describe('Role', () => {
       ],
     };
     try {
-      const result = new Role(props);
+      new Role(props);
       // Fail test if this doesn't throw
       expect(true).toBe(false);
     } catch (error) {

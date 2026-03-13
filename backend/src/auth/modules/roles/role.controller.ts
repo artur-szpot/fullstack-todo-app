@@ -1,10 +1,101 @@
-import { Controller } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Inject,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
+
+import { RequirePermissions } from '@auth/decorators/permissions.decorator';
+import { JwtAuthGuard } from '@auth/guards/jwt.guard';
+import { PermisionsGuard } from '@auth/guards/permissions.guard';
+import { PaginationDto } from '@common/pagination/dto/in/pagination.dto';
+import { paginationMapper } from '@common/pagination/mapper/pagination.mapper';
+import { Paginated } from '@common/pagination/Paginated';
+
+import { PermissionLevel } from '../permissions/enums/permission-level.enum';
+import { PermissionType } from '../permissions/enums/permission-type.enum';
+import { CreateRoleDto } from './dto/in/create-role.dto';
+import { GetRoleByIdDto } from './dto/in/get-role-by-id.dto';
+import { GetRoleByNameDto } from './dto/in/get-role-by-name.dto';
+import { UpdateRoleDto } from './dto/in/update-role.dto';
+import { RoleResponse } from './dto/out/role.response';
+import { ROLE_GATEWAY, RoleGateway } from './infrastructure/role.gateway';
 
 @Controller('roles')
+@UseGuards(JwtAuthGuard, PermisionsGuard)
 export class RoleController {
-  // get role
-  // get all roles with pagination
-  // post new role
-  // delete existing role (make admin and user protected!)
-  // patch to change role permissions
+  constructor(
+    @Inject(ROLE_GATEWAY)
+    private readonly gateway: RoleGateway,
+  ) {}
+
+  @Get('/:id')
+  @RequirePermissions(
+    [PermissionType.ROLES, PermissionLevel.READ],
+    [PermissionType.PERMISSIONS, PermissionLevel.READ],
+  )
+  async getRoleById(@Param() params: GetRoleByIdDto): Promise<RoleResponse> {
+    return this.gateway.getById(params.id);
+  }
+
+  @Get('/name/:name')
+  @RequirePermissions(
+    [PermissionType.ROLES, PermissionLevel.READ],
+    [PermissionType.PERMISSIONS, PermissionLevel.READ],
+  )
+  async getRoleByName(
+    @Param() params: GetRoleByNameDto,
+  ): Promise<RoleResponse> {
+    return this.gateway.getByName(params.name);
+  }
+
+  @Get()
+  @RequirePermissions(
+    [PermissionType.ROLES, PermissionLevel.READ],
+    [PermissionType.PERMISSIONS, PermissionLevel.READ],
+  )
+  async getRoles(
+    @Query() pagination: PaginationDto,
+  ): Promise<Paginated<RoleResponse>> {
+    return this.gateway.getMany(paginationMapper.fromDto(pagination));
+  }
+
+  @Post()
+  @RequirePermissions(
+    [PermissionType.ROLES, PermissionLevel.CREATE],
+    [PermissionType.PERMISSIONS, PermissionLevel.READ],
+  )
+  async createRole(@Body() body: CreateRoleDto): Promise<RoleResponse> {
+    console.log(JSON.stringify(body));
+    return this.gateway.create(body);
+  }
+
+  @Patch('/:id')
+  @RequirePermissions(
+    [PermissionType.ROLES, PermissionLevel.FULL],
+    [PermissionType.PERMISSIONS, PermissionLevel.READ],
+  )
+  async updateRole(
+    @Param() params: GetRoleByIdDto,
+    @Body() body: UpdateRoleDto,
+  ): Promise<RoleResponse> {
+    return this.gateway.update(params.id, body);
+  }
+
+  @Delete('/:id')
+  @RequirePermissions(
+    [PermissionType.ROLES, PermissionLevel.FULL],
+    [PermissionType.PERMISSIONS, PermissionLevel.READ],
+  )
+  async deleteRole(@Param() params: GetRoleByIdDto): Promise<RoleResponse> {
+    return this.gateway.delete(params.id);
+  }
 }

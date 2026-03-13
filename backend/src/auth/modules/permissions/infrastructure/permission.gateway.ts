@@ -1,6 +1,6 @@
-import { Pagination } from '@common/pagination';
+import { Pagination } from '@common/pagination/pagination';
 
-import { Paginated } from '@common/Paginated';
+import { Paginated } from '@common/pagination/Paginated';
 import { PermissionResponse } from '../dto/out/permission.response';
 import { PermissionType } from '../enums/permission-type.enum';
 
