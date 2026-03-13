@@ -8,12 +8,29 @@ services:
       - 3001:3001
     depends_on:
       - db
+    develop:
+      watch:
+        - action: sync
+          path: ./backend/src
+          target: /app/src
+        - action: rebuild
+          path: package.json
 
   frontend:
     build:
       context: frontend
+      dockerfile: Dockerfile.dev
     ports:
-      - 3002:80
+      - 3002:5173
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend
+          target: /app
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: package.json
 
   db:
     image: postgres:17
