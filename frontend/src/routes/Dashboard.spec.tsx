@@ -1,5 +1,10 @@
+import { render, screen } from "@testing-library/react";
+
+import { Dashboard } from "./Dashboard";
+
 describe("Dashboard", () => {
-  it("should fail because no tests have been written", async () => {
-    expect(true).toBe(false);
+  it("should be defined", async () => {
+    render(<Dashboard />);
+    expect(screen.getByText("Todo!")).toBeDefined();
   });
 });

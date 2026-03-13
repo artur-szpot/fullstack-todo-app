@@ -8,6 +8,14 @@ VALUES (
    'todo-permission-users',
    'FULL'
 ), (
+   'todo-role-admin',
+   'todo-permission-roles',
+   'FULL'
+), (
+   'todo-role-admin',
+   'todo-permission-permissions',
+   'FULL'
+), (
    'todo-role-user',
    'todo-permission-todos',
    'FULL'
