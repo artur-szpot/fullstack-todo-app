@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { createId } from '@paralleldrive/cuid2';
 
 import { CreateRoleDto } from '@auth/modules/roles/dto/in/create-role.dto';
 import { RoleDto } from '@auth/modules/roles/dto/in/role.dto';
@@ -6,7 +7,6 @@ import { UpdateRoleDto } from '@auth/modules/roles/dto/in/update-role.dto';
 import { Pagination } from '@common/pagination/pagination';
 import { DbSearchDto } from '@db/dto/search.dto';
 
-import { createId } from '@paralleldrive/cuid2';
 import { RoleRepository } from '../../repositories/role.repository';
 import { PostgresConnector } from './PostgresConnector';
 

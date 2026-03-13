@@ -9,7 +9,7 @@ import {
   PermissionProps,
 } from '@auth/modules/permissions/domain/Permission';
 import { Entity, EntityProps } from '@common/Entity';
-import { IncorrectEntityProps } from '@common/incorrect-entity-props.error';
+import { IncorrectEntityProps } from '@common/errors/incorrect-entity-props.error';
 
 export const RoleProps = t.intersection([
   EntityProps,

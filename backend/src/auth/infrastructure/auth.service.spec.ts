@@ -5,7 +5,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
-import { User } from '@auth/modules/users/domain/User';
+import { UserDto } from '@auth/modules/users/dto/in/user.dto';
 import { UserRepository } from '@db/repositories/user.repository';
 
 import { LoginDto } from '../dto/in/login.dto';
@@ -14,64 +14,65 @@ import { AuthService } from './auth.service';
 describe('AuthService', () => {
   const mockJwtService: JwtService = jest.requireMock('@nestjs/jwt');
   const mockUsersRepository: UserRepository = jest.requireMock(
-    '@db/repositories/users.repository',
+    '@db/repositories/user.repository',
   );
   const service = new AuthService(mockJwtService, mockUsersRepository);
 
   const loginDto: LoginDto = {
-    username: 'test',
+    email: 'test',
     password: 'secret',
   };
   const wrongLoginDto: LoginDto = {
-    username: 'test',
+    email: 'test',
     password: 'wrong',
   };
-  const getUser = () =>
-    User.fromDto({
-      id: '1',
-      email: 'test@test.com',
-      username: 'Test User',
-      password: bcrypt.hashSync('secret', 10),
-      roles: [
-        {
-          id: '1',
-          description: 'text',
-          name: 'test role',
-          permissions: [],
-        },
-      ],
-    });
+  const userDto: UserDto = {
+    id: '1',
+    email: 'test@test.com',
+    username: 'Test User',
+    joinedDate: '2025-09-18T19:56:17.000Z',
+    password: bcrypt.hashSync('secret', 10),
+    roles: [
+      {
+        id: '1',
+        description: 'text',
+        name: 'test role',
+        protectedRole: true,
+        permissions: [],
+      },
+    ],
+  };
 
   beforeEach(() => {
     mockJwtService.sign = jest.fn().mockReturnValueOnce('token');
   });
 
   it('should log in an existing user', async () => {
-    mockUsersRepository.getUserByUsername = jest
+    mockUsersRepository.getUserByEmail = jest
       .fn()
-      .mockResolvedValueOnce(getUser());
+      .mockResolvedValueOnce(userDto);
 
     const result = await service.login(loginDto);
 
-    expect(mockUsersRepository.getUserByUsername).toHaveBeenCalledWith(
-      loginDto.username,
+    expect(mockUsersRepository.getUserByEmail).toHaveBeenCalledWith(
+      loginDto.email,
     );
     expect(mockJwtService.sign).toHaveBeenCalledTimes(1);
     expect(result).toStrictEqual({ access_token: 'token' });
   });
 
   it('should return generic error if wrong password given', async () => {
-    mockUsersRepository.getUserByUsername = jest
+    mockUsersRepository.getUserByEmail = jest
       .fn()
-      .mockResolvedValueOnce(getUser());
+      .mockResolvedValueOnce(userDto);
 
     try {
       await service.login(wrongLoginDto);
       // Fail test if this doesn't throw
       expect(true).toBe(false);
     } catch (error) {
-      expect(mockUsersRepository.getUserByUsername).toHaveBeenCalledWith(
-        loginDto.username,
+      expect(mockUsersRepository.getUserByEmail).toHaveBeenCalledWith(
+        loginDto.email,
       );
       expect(mockJwtService.sign).toHaveBeenCalledTimes(0);
       expect(error).toBeInstanceOf(UnauthorizedException);
@@ -80,17 +81,15 @@ describe('AuthService', () => {
   });
 
   it("should return generic error if user doesn't exist", async () => {
-    mockUsersRepository.getUserByUsername = jest
-      .fn()
-      .mockResolvedValueOnce(null);
+    mockUsersRepository.getUserByEmail = jest.fn().mockResolvedValueOnce(null);
 
     try {
       await service.login(loginDto);
       // Fail test if this doesn't throw
       expect(true).toBe(false);
     } catch (error) {
-      expect(mockUsersRepository.getUserByUsername).toHaveBeenCalledWith(
-        loginDto.username,
+      expect(mockUsersRepository.getUserByEmail).toHaveBeenCalledWith(
+        loginDto.email,
       );
       expect(mockJwtService.sign).toHaveBeenCalledTimes(0);
       expect(error).toBeInstanceOf(UnauthorizedException);
@@ -99,7 +98,7 @@ describe('AuthService', () => {
   });
 
   it('should return generic error if dependent class fails', async () => {
-    mockUsersRepository.getUserByUsername = jest
+    mockUsersRepository.getUserByEmail = jest
       .fn()
       .mockRejectedValueOnce(new Error("table users doesn't exist"));
 
@@ -108,12 +107,14 @@ describe('AuthService', () => {
       // Fail test if this doesn't throw
       expect(true).toBe(false);
     } catch (error) {
-      expect(mockUsersRepository.getUserByUsername).toHaveBeenCalledWith(
-        loginDto.username,
+      expect(mockUsersRepository.getUserByEmail).toHaveBeenCalledWith(
+        loginDto.email,
       );
       expect(mockJwtService.sign).toHaveBeenCalledTimes(0);
       expect(error).toBeInstanceOf(InternalServerErrorException);
-      expect(error.message).toEqual('Failed to validate user');
+      expect(error.message).toEqual(
+        'Unexpected error occurred while signing in',
+      );
     }
   });
 });

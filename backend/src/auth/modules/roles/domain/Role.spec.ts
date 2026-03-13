@@ -1,7 +1,7 @@
 import { Permission } from '@auth/modules/permissions/domain/Permission';
 import { PermissionLevel } from '@auth/modules/permissions/enums/permission-level.enum';
 import { PermissionType } from '@auth/modules/permissions/enums/permission-type.enum';
-import { IncorrectEntityProps } from '@common/incorrect-entity-props.error';
+import { IncorrectEntityProps } from '@common/errors/incorrect-entity-props.error';
 
 import { RoleDto } from '../dto/in/role.dto';
 import { roleMapper } from '../mappers/role.mapper';

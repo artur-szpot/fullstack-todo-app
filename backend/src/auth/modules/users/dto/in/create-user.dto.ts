@@ -1,31 +1,27 @@
+import { Type } from 'class-transformer';
 import {
   ArrayMinSize,
   IsArray,
-  IsDateString,
   IsEmail,
   IsNotEmpty,
-  IsOptional,
   IsString,
-  MaxLength,
   ValidateNested,
 } from 'class-validator';
 
-import { RoleDto } from '@auth/modules/roles/dto/in/role.dto';
-
-export class UserDto {
+export class UserRole {
   @IsString()
   @IsNotEmpty()
-  @MaxLength(40)
-  id: string;
+  roleId: string;
+}
 
+export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   username: string;
 
   @IsString()
   @IsNotEmpty()
-  @IsOptional()
-  password?: string;
+  password: string;
 
   @IsString()
   @IsNotEmpty()
@@ -33,16 +29,8 @@ export class UserDto {
   email: string;
 
   @IsArray()
+  @Type(() => UserRole)
   @ArrayMinSize(1)
   @ValidateNested({ each: true })
-  roles: RoleDto[];
-
-  @IsDateString()
-  @IsNotEmpty()
-  joinedDate: string;
-
-  @IsDateString()
-  @IsNotEmpty()
-  @IsOptional()
-  lastLogin?: string;
+  roles: UserRole[];
 }

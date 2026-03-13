@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
-export class GetRoleByIdDto {
+export class GetEntityByIdDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(40)

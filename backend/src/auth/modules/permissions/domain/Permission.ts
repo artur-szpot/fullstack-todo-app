@@ -5,7 +5,7 @@ import { NonEmptyString } from 'io-ts-types';
 import { PathReporter } from 'io-ts/PathReporter';
 
 import { Entity, EntityProps } from '@common/Entity';
-import { IncorrectEntityProps } from '@common/incorrect-entity-props.error';
+import { IncorrectEntityProps } from '@common/errors/incorrect-entity-props.error';
 
 import { PermissionLevel } from '../enums/permission-level.enum';
 import { PermissionType } from '../enums/permission-type.enum';

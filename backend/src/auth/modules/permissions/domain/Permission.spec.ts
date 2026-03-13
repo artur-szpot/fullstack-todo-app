@@ -1,4 +1,4 @@
-import { IncorrectEntityProps } from '@common/incorrect-entity-props.error';
+import { IncorrectEntityProps } from '@common/errors/incorrect-entity-props.error';
 
 import { PermissionDto } from '../dto/in/permission.dto';
 import { PermissionLevel } from '../enums/permission-level.enum';

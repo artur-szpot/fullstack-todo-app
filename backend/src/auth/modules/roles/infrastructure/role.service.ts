@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 
 import { InternalError, NotFoundError } from '@common/errors/service-errors';
+import { validateUpdateDtoNotEmpty } from '@common/helpers/validate-update-dto-not-empty';
 import { Paginated } from '@common/pagination/Paginated';
 import { Pagination } from '@common/pagination/pagination';
 import {
@@ -13,7 +14,7 @@ import {
   RoleRepository,
 } from '@db/repositories/role.repository';
 
-import { CreateRoleDto } from '../dto/in/create-role.dto';
+import { CreateRoleDto, RolePermission } from '../dto/in/create-role.dto';
 import { UpdateRoleDto } from '../dto/in/update-role.dto';
 import { RoleResponse } from '../dto/out/role.response';
 import { roleMapper } from '../mappers/role.mapper';
@@ -85,10 +86,7 @@ export class RoleService implements RoleGateway {
     }
   }
 
-  private ensureUniquePermissions(
-    input: Partial<Pick<CreateRoleDto, 'permissions'>>,
-  ): void {
-    const { permissions } = input;
+  private ensureUniquePermissions(permissions?: RolePermission[]): void {
     if (!permissions) {
       return;
     }
@@ -108,13 +106,30 @@ export class RoleService implements RoleGateway {
     );
   }
 
-  public async create(input: CreateRoleDto): Promise<RoleResponse> {
-    this.ensureUniquePermissions(input);
-    if ((await this.roleRepository.getRoleByName(input.name)) !== null) {
+  private async ensureUniqueName(name: string): Promise<void> {
+    if ((await this.roleRepository.getRoleByName(name)) !== null) {
+      throw new BadRequestException(`Role with name "${name}" already exists`);
+    }
+  }
+
+  private async ensureRoleExistsAndIsNotProtected(
+    roleId: string,
+  ): Promise<void> {
+    const existingRole = await this.roleRepository.getRoleById(roleId);
+    if (existingRole === null) {
+      throw new BadRequestException(`Role with ID "${roleId}" doesn\'t exist`);
+    }
+    if (existingRole.protectedRole) {
       throw new BadRequestException(
-        `Role with name "${input.name}" already exists`,
+        `This role is protected and cannot be modified`,
       );
     }
+  }
+
+  public async create(input: CreateRoleDto): Promise<RoleResponse> {
+    this.ensureUniquePermissions(input.permissions);
+    this.ensureUniqueName(input.name);
+
     try {
       const roleDto = await this.roleRepository.createRole(input);
       const role = roleMapper.fromDto.toDomain(roleDto);
@@ -129,19 +144,10 @@ export class RoleService implements RoleGateway {
     roleId: string,
     input: UpdateRoleDto,
   ): Promise<RoleResponse> {
-    if (Object.keys(input).length === 0) {
-      throw new BadRequestException(`Specify at least one field to update`);
-    }
-    this.ensureUniquePermissions(input);
-    const existingRole = await this.roleRepository.getRoleById(roleId);
-    if (existingRole === null) {
-      throw new BadRequestException(`Role with ID "${roleId}" doesn\'t exist`);
-    }
-    if (existingRole.protectedRole) {
-      throw new BadRequestException(
-        `This role is protected and cannot be modified`,
-      );
-    }
+    validateUpdateDtoNotEmpty(input);
+    this.ensureUniquePermissions(input.permissions);
+    this.ensureRoleExistsAndIsNotProtected(roleId);
+
     if (
       input.name &&
       (await this.roleRepository.getRoleByName(input.name)) !== null
@@ -161,15 +167,8 @@ export class RoleService implements RoleGateway {
   }
 
   public async delete(roleId: string): Promise<RoleResponse> {
-    const existingRole = await this.roleRepository.getRoleById(roleId);
-    if (existingRole === null) {
-      throw new BadRequestException(`Role with ID "${roleId}" doesn\'t exist`);
-    }
-    if (existingRole.protectedRole) {
-      throw new BadRequestException(
-        `This role is protected and cannot be removed`,
-      );
-    }
+    this.ensureRoleExistsAndIsNotProtected(roleId);
+
     try {
       const roleDto = await this.roleRepository.deleteRole(roleId);
       const role = roleMapper.fromDto.toDomain(roleDto);

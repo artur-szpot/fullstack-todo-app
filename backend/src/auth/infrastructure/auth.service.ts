@@ -1,19 +1,19 @@
 import {
   Inject,
   Injectable,
-  InternalServerErrorException,
   Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
+import { userMapper } from '@auth/modules/users/mappers/user.mapper';
+import { InternalError } from '@common/errors/service-errors';
 import {
   USER_REPOSITORY,
   UserRepository,
 } from '@db/repositories/user.repository';
 
-import { userMapper } from '@auth/modules/users/mappers/user.mapper';
 import { JwtDto } from '../dto/in/jwt.dto';
 import { LoginDto } from '../dto/in/login.dto';
 import { LoginResponse } from '../dto/out/login.response';
@@ -27,21 +27,11 @@ export class AuthService implements AuthGateway {
   constructor(
     private readonly jwtService: JwtService,
     @Inject(USER_REPOSITORY)
-    private readonly usersRepository: UserRepository,
+    private readonly userRepository: UserRepository,
   ) {}
 
-  private async validateUser(
-    username: string,
-    password: string,
-  ): Promise<User | null> {
-    const userDto = await (async (_username) => {
-      try {
-        return await this.usersRepository.getUserByUsername(_username);
-      } catch (error) {
-        this.logger.error(`Failed to validate user: ${error}`);
-        throw new InternalServerErrorException('Failed to validate user');
-      }
-    })(username);
+  private async validateUser(email: string, password: string): Promise<User> {
+    const userDto = await this.userRepository.getUserByEmail(email);
     if (userDto) {
       const user = userMapper.fromDto.toDomain(userDto);
       const correctPassword = await bcrypt.compare(
@@ -57,18 +47,26 @@ export class AuthService implements AuthGateway {
   }
 
   async login(dto: LoginDto): Promise<LoginResponse> {
-    const { username, password } = dto;
-    const user = await this.validateUser(username, password);
-    const { id } = user.getProps();
-    const payload: JwtDto = {
-      id,
-      username,
-      permissions: user.getPermissions(),
-    };
-    return {
-      access_token: this.jwtService.sign(payload, {
-        secret: process.env.AUTH_SECRET,
-      }),
-    };
+    try {
+      const { email, password } = dto;
+      const user = await this.validateUser(email, password);
+      const { id } = user.getProps();
+      const payload: JwtDto = {
+        id,
+        email,
+        permissions: user.getPermissions(),
+      };
+      return {
+        access_token: this.jwtService.sign(payload, {
+          secret: process.env.AUTH_SECRET,
+        }),
+      };
+    } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
+      this.logger.error(`Unexpected error while signing in: ${error}`);
+      throw new InternalError('signing in');
+    }
   }
 }

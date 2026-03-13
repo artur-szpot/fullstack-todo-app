@@ -9,13 +9,12 @@ import {
   Post,
   Query,
   UseGuards,
-  UsePipes,
-  ValidationPipe,
 } from '@nestjs/common';
 
 import { RequirePermissions } from '@auth/decorators/permissions.decorator';
 import { JwtAuthGuard } from '@auth/guards/jwt.guard';
 import { PermisionsGuard } from '@auth/guards/permissions.guard';
+import { GetEntityByIdDto } from '@common/dto/in/get-entity-by-id.dto';
 import { PaginationDto } from '@common/pagination/dto/in/pagination.dto';
 import { paginationMapper } from '@common/pagination/mapper/pagination.mapper';
 import { Paginated } from '@common/pagination/Paginated';
@@ -23,7 +22,6 @@ import { Paginated } from '@common/pagination/Paginated';
 import { PermissionLevel } from '../permissions/enums/permission-level.enum';
 import { PermissionType } from '../permissions/enums/permission-type.enum';
 import { CreateRoleDto } from './dto/in/create-role.dto';
-import { GetRoleByIdDto } from './dto/in/get-role-by-id.dto';
 import { GetRoleByNameDto } from './dto/in/get-role-by-name.dto';
 import { UpdateRoleDto } from './dto/in/update-role.dto';
 import { RoleResponse } from './dto/out/role.response';
@@ -42,7 +40,7 @@ export class RoleController {
     [PermissionType.ROLES, PermissionLevel.READ],
     [PermissionType.PERMISSIONS, PermissionLevel.READ],
   )
-  async getRoleById(@Param() params: GetRoleByIdDto): Promise<RoleResponse> {
+  async getRoleById(@Param() params: GetEntityByIdDto): Promise<RoleResponse> {
     return this.gateway.getById(params.id);
   }
 
@@ -84,7 +82,7 @@ export class RoleController {
     [PermissionType.PERMISSIONS, PermissionLevel.READ],
   )
   async updateRole(
-    @Param() params: GetRoleByIdDto,
+    @Param() params: GetEntityByIdDto,
     @Body() body: UpdateRoleDto,
   ): Promise<RoleResponse> {
     return this.gateway.update(params.id, body);
@@ -95,7 +93,7 @@ export class RoleController {
     [PermissionType.ROLES, PermissionLevel.FULL],
     [PermissionType.PERMISSIONS, PermissionLevel.READ],
   )
-  async deleteRole(@Param() params: GetRoleByIdDto): Promise<RoleResponse> {
+  async deleteRole(@Param() params: GetEntityByIdDto): Promise<RoleResponse> {
     return this.gateway.delete(params.id);
   }
 }
