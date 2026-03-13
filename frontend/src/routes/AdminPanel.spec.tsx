@@ -5,6 +5,6 @@ import { AdminPanel } from "./AdminPanel";
 describe("AdminPanel", () => {
   it("should be defined", async () => {
     render(<AdminPanel />);
-    expect(screen.getByText("Todo!")).toBeDefined();
+    expect(screen.getByText("Admin Panel")).toBeDefined();
   });
 });
