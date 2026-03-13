@@ -8,13 +8,15 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
-import { UserRepository } from '@db/repositories/user.repository';
-import { USERS_CONNECTOR } from '@db/symbols';
+import {
+  USER_REPOSITORY,
+  UserRepository,
+} from '@db/repositories/user.repository';
 
-import { User } from '../modules/users/domain/User';
 import { JwtDto } from '../dto/in/jwt.dto';
 import { LoginDto } from '../dto/in/login.dto';
 import { LoginResponse } from '../dto/out/login.response';
+import { User } from '../modules/users/domain/User';
 import { AuthGateway } from './auth.gateway';
 
 @Injectable()
@@ -23,7 +25,7 @@ export class AuthService implements AuthGateway {
 
   constructor(
     private readonly jwtService: JwtService,
-    @Inject(USERS_CONNECTOR)
+    @Inject(USER_REPOSITORY)
     private readonly usersRepository: UserRepository,
   ) {}
 

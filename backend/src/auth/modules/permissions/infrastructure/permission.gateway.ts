@@ -8,3 +8,5 @@ export interface PermissionGateway {
   getByType(permissionType: PermissionType): Promise<PermissionResponse>;
   getMany(pagination?: Pagination): Promise<Paginated<PermissionResponse>>;
 }
+
+export const PERMISSION_GATEWAY = Symbol('PERMISSION_GATEWAY');

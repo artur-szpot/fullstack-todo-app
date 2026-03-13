@@ -10,3 +10,5 @@ export interface UserRepository {
   // update user
   // delete user
 }
+
+export const USER_REPOSITORY = Symbol('USER_REPOSITORY');

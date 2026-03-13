@@ -10,3 +10,5 @@ export interface RoleRepository {
   // update role
   // delete role
 }
+
+export const ROLE_REPOSITORY = Symbol('ROLE_REPOSITORY');

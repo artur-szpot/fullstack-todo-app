@@ -12,14 +12,7 @@ import { PostgresConnector } from './connector';
 export class PostgresUserRepository implements UserRepository {
   private readonly logger = new Logger(PostgresUserRepository.name);
 
-  private static SELECT_USERS_WHERE_PARTIAL_SQL = (
-    args?: DbSearchDto,
-  ): string => {
-    const { where, orderBy, pagination } = args ?? {};
-    if (!where && !orderBy && !pagination) {
-      return 'users u';
-    }
-    const { pageNumber, pageSize } = pagination ?? {};
+  private SELECT_USERS_WHERE_PARTIAL_SQL = (args?: DbSearchDto): string => {
     return `(
      SELECT 
         id,
@@ -27,13 +20,11 @@ export class PostgresUserRepository implements UserRepository {
         password,
         email
      FROM users 
-     ${where ? `WHERE ${where}` : ''}
-     ${orderBy ? `ORDER BY ${orderBy}` : ''}
-     ${pagination ? `LIMIT ${pageSize} OFFSET ${pageNumber * pageSize}` : ''}
+     ${this.connector.searchSQL(args)}
     ) u`;
   };
 
-  private static SELECT_USERS_SQL = (args?: DbSearchDto): string => `
+  private SELECT_USERS_SQL = (args?: DbSearchDto): string => `
    SELECT 
       u.id,
       u.username,
@@ -47,7 +38,7 @@ export class PostgresUserRepository implements UserRepository {
             'permissions', role_permissions_helper.permissions
          )
       ) AS roles
-   FROM ${PostgresUserRepository.SELECT_USERS_WHERE_PARTIAL_SQL(args)}
+   FROM ${this.SELECT_USERS_WHERE_PARTIAL_SQL(args)}
    JOIN users_roles ur 
       ON u.id = ur.user_id
    JOIN roles r 
@@ -72,7 +63,7 @@ export class PostgresUserRepository implements UserRepository {
    GROUP BY u.id, u.username, u.password, u.email;
   `;
 
-  private static SELECT_USERS_COUNT_SQL = (): string =>
+  private SELECT_USERS_COUNT_SQL = (): string =>
     `SELECT COUNT(*) AS total FROM users;`;
 
   constructor(private readonly connector: PostgresConnector) {}
@@ -90,13 +81,13 @@ export class PostgresUserRepository implements UserRepository {
 
   public async getUserById(userId: string): Promise<User | null> {
     return this.getSingleUser(
-      PostgresUserRepository.SELECT_USERS_SQL({ where: `id = '${userId}'` }),
+      this.SELECT_USERS_SQL({ where: `id = '${userId}'` }),
     );
   }
 
   public async getUserByUsername(username: string): Promise<User | null> {
     return this.getSingleUser(
-      PostgresUserRepository.SELECT_USERS_SQL({
+      this.SELECT_USERS_SQL({
         where: `username = '${username}'`,
       }),
     );
@@ -105,7 +96,7 @@ export class PostgresUserRepository implements UserRepository {
   public async getManyUsers(pagination?: Pagination): Promise<User[]> {
     const connection = this.connector.getConnection();
     const resultRaw = await connection.query(
-      PostgresUserRepository.SELECT_USERS_SQL({
+      this.SELECT_USERS_SQL({
         orderBy: 'username ASC',
         pagination,
       }),
@@ -120,9 +111,7 @@ export class PostgresUserRepository implements UserRepository {
 
   public async getAllUsersCount(): Promise<number> {
     const connection = this.connector.getConnection();
-    const resultRaw = await connection.query(
-      PostgresUserRepository.SELECT_USERS_COUNT_SQL,
-    );
+    const resultRaw = await connection.query(this.SELECT_USERS_COUNT_SQL);
     if (!resultRaw?.rows?.[0]) {
       return 0;
     }

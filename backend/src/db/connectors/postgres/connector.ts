@@ -1,3 +1,4 @@
+import { DbSearchDto } from '@db/dto/search.dto';
 import { Injectable, Logger } from '@nestjs/common';
 import { Pool } from 'pg';
 
@@ -36,4 +37,14 @@ export class PostgresConnector {
     }
     return this.pool;
   }
+
+  public searchSQL = (args?: DbSearchDto): string => {
+    const { where, orderBy, pagination } = args ?? {};
+    const { pageNumber, pageSize } = pagination ?? {};
+    return `
+       ${where ? `WHERE ${where}` : ''}
+       ${orderBy ? `ORDER BY ${orderBy}` : ''}
+       ${pagination ? `LIMIT ${pageSize} OFFSET ${pageNumber * pageSize}` : ''}
+    `;
+  };
 }
