@@ -8,6 +8,7 @@ import { Pagination } from '@common/pagination/pagination';
 import { DbSearchDto } from '@db/dto/search.dto';
 
 import { RoleRepository } from '../../repositories/role.repository';
+import { PostgresConnection } from './PostgresConnection';
 import { PostgresConnector } from './PostgresConnector';
 
 @Injectable()
@@ -121,6 +122,23 @@ export class PostgresRoleRepository implements RoleRepository {
     return this.connector.getCount(this.SELECT_ROLES_COUNT_SQL);
   }
 
+  private async createRolePermissions(
+    connection: PostgresConnection,
+    id: string,
+    input: CreateRoleDto | UpdateRoleDto,
+  ) {
+    return connection.query(
+      this.CREATE_ROLE_PERMISSIONS_SQL(input.permissions.length),
+      [
+        id,
+        ...input.permissions.flatMap((permission) => [
+          permission.permissionType,
+          permission.permissionLevel,
+        ]),
+      ],
+    );
+  }
+
   public async createRole(input: CreateRoleDto): Promise<RoleDto> {
     const connection = await this.connector.getConnection();
     await connection.query('BEGIN;');
@@ -131,16 +149,7 @@ export class PostgresRoleRepository implements RoleRepository {
         input.name,
         input.description,
       ]);
-      await connection.query(
-        this.CREATE_ROLE_PERMISSIONS_SQL(input.permissions.length),
-        [
-          id,
-          ...input.permissions.flatMap((permission) => [
-            permission.permissionType,
-            permission.permissionLevel,
-          ]),
-        ],
-      );
+      await this.createRolePermissions(connection, id, input);
       await connection.query('COMMIT;');
       return this.getRoleById(id);
     } catch (error) {
@@ -158,22 +167,17 @@ export class PostgresRoleRepository implements RoleRepository {
     const connection = await this.connector.getConnection();
     await connection.query('BEGIN;');
     try {
-      await connection.query<RoleDto>(
-        this.UPDATE_ROLE_SQL(input),
-        [roleId, input.name, input.description].filter(Boolean),
-      );
+      if (input.name !== undefined || input.description !== undefined) {
+        await connection.query<RoleDto>(
+          this.UPDATE_ROLE_SQL(input),
+          [roleId, input.name, input.description].filter(Boolean),
+        );
+      }
+      // Since each role has to have at least one permission, only remove
+      // and recreate role permissions if any are given.
       if (input.permissions !== undefined && input.permissions.length) {
         await connection.query(this.DELETE_ROLE_PERMISSIONS_SQL, [roleId]);
-        await connection.query(
-          this.CREATE_ROLE_PERMISSIONS_SQL(input.permissions.length),
-          [
-            roleId,
-            ...input.permissions.flatMap((permission) => [
-              permission.permissionType,
-              permission.permissionLevel,
-            ]),
-          ],
-        );
+        await this.createRolePermissions(connection, roleId, input);
       }
       await connection.query('COMMIT;');
       return this.getRoleById(roleId);

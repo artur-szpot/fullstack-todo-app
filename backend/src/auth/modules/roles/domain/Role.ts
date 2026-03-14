@@ -1,7 +1,7 @@
 import { Logger } from '@nestjs/common';
 import { isLeft } from 'fp-ts/lib/Either';
 import * as t from 'io-ts';
-import { NonEmptyString } from 'io-ts-types';
+import { nonEmptyArray, NonEmptyString } from 'io-ts-types';
 import { PathReporter } from 'io-ts/PathReporter';
 
 import {
@@ -17,7 +17,7 @@ export const RoleProps = t.intersection([
     {
       name: NonEmptyString,
       description: NonEmptyString,
-      permissions: t.array(PermissionProps),
+      permissions: nonEmptyArray(PermissionProps),
       protectedRole: t.boolean,
     },
     'requiredRoleProps',

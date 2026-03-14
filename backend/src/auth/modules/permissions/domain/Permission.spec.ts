@@ -1,3 +1,5 @@
+import { Logger } from '@nestjs/common';
+
 import { IncorrectEntityProps } from '@common/errors/incorrect-entity-props.error';
 
 import { PermissionDto } from '../dto/in/permission.dto';
@@ -7,13 +9,15 @@ import { permissionMapper } from '../mappers/permission.mapper';
 import { Permission } from './Permission';
 
 describe('Permission', () => {
+  const logger = new Logger('PermissionTest');
+
   it('should create a Permission based on correct props without ID', async () => {
     const props = {
       description: 'text',
       permissionType: PermissionType.TODOS,
       permissionLevel: PermissionLevel.FULL,
     };
-    const entity = new Permission(props);
+    const entity = new Permission(logger, props);
     expect(entity).toBeDefined();
     expect(entity).toBeInstanceOf(Permission);
     expect(entity.toString()).toEqual(
@@ -32,7 +36,7 @@ describe('Permission', () => {
       permissionType: PermissionType.TODOS,
       permissionLevel: PermissionLevel.FULL,
     };
-    const entity = new Permission(props);
+    const entity = new Permission(logger, props);
     expect(entity).toBeDefined();
     expect(entity).toBeInstanceOf(Permission);
     expect(entity.toString()).toEqual(
@@ -43,7 +47,6 @@ describe('Permission', () => {
 
   it('should create a Permission based on correct DTO', async () => {
     const dto: PermissionDto = {
-      id: '1',
       description: 'text',
       permissionType: PermissionType.TODOS,
       permissionLevel: PermissionLevel.FULL,
@@ -54,12 +57,11 @@ describe('Permission', () => {
     expect(entity.toString()).toEqual(
       `Permission type: ${dto.permissionType}, level: ${dto.permissionLevel}`,
     );
-    expect(entity.getProps()).toEqual(dto);
+    expect(entity.getProps()).toEqual({ ...dto, id: 'mocked-id' });
   });
 
   it('should create a Permission based on correct DTO without level', async () => {
     const dto: PermissionDto = {
-      id: '1',
       description: 'text',
       permissionType: PermissionType.TODOS,
     };
@@ -67,7 +69,11 @@ describe('Permission', () => {
     expect(entity).toBeDefined();
     expect(entity).toBeInstanceOf(Permission);
     expect(entity.toString()).toEqual(`Permission type: ${dto.permissionType}`);
-    expect(entity.getProps()).toEqual(dto);
+    expect(entity.getProps()).toEqual({
+      ...dto,
+      id: 'mocked-id',
+      permissionLevel: undefined,
+    });
   });
 
   it('should fail to create a Permission based on incorrect props', async () => {
@@ -78,7 +84,7 @@ describe('Permission', () => {
       permissionLevel: PermissionLevel.FULL,
     };
     try {
-      const result = new Permission(props);
+      new Permission(logger, props);
       // Fail test if this doesn't throw
       expect(true).toBe(false);
     } catch (error) {
@@ -93,7 +99,7 @@ describe('Permission', () => {
       permissionLevel: PermissionLevel.FULL,
     };
     try {
-      const result = new Permission(props);
+      new Permission(logger, props);
       // Fail test if this doesn't throw
       expect(true).toBe(false);
     } catch (error) {

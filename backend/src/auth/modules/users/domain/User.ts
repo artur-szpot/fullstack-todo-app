@@ -1,7 +1,7 @@
 import { Logger } from '@nestjs/common';
 import { isLeft } from 'fp-ts/lib/Either';
 import * as t from 'io-ts';
-import { DateFromISOString, NonEmptyString } from 'io-ts-types';
+import { DateFromISOString, nonEmptyArray, NonEmptyString } from 'io-ts-types';
 import { PathReporter } from 'io-ts/PathReporter';
 
 import { PermissionDefinition } from '@auth/decorators/permissions.decorator';
@@ -26,7 +26,7 @@ export const UserProps = t.intersection([
     {
       username: NonEmptyString,
       email: NonEmptyString,
-      roles: t.array(RoleProps),
+      roles: nonEmptyArray(RoleProps),
       joinedDate: DateFromISOString,
     },
     'requiredUserProps',

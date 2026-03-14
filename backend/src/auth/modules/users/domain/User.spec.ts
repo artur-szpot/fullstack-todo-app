@@ -109,6 +109,9 @@ describe('User', () => {
     expect(entity.getProps()).toEqual({
       ...dto,
       roles: dto.roles.map((role) => new Role(logger, role)),
+      joinedDate: new Date(dto.joinedDate),
+      lastLogin: undefined,
+      password: undefined,
     });
   });
 

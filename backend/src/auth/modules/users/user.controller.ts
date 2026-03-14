@@ -18,6 +18,9 @@ import { PaginationDto } from '@common/pagination/dto/in/pagination.dto';
 import { paginationMapper } from '@common/pagination/mapper/pagination.mapper';
 import { Paginated } from '@common/pagination/Paginated';
 
+import { RequirePermissions } from '@auth/decorators/permissions.decorator';
+import { PermissionLevel } from '../permissions/enums/permission-level.enum';
+import { PermissionType } from '../permissions/enums/permission-type.enum';
 import { CreateUserDto } from './dto/in/create-user.dto';
 import { UpdateUserDto } from './dto/in/update-user.dto';
 import { UserResponse } from './dto/out/user.response';
@@ -32,6 +35,11 @@ export class UserController {
   ) {}
 
   @Get('/:id')
+  @RequirePermissions(
+    [PermissionType.USERS, PermissionLevel.READ],
+    [PermissionType.ROLES, PermissionLevel.READ],
+    [PermissionType.PERMISSIONS, PermissionLevel.READ],
+  )
   public async getUserById(
     @Param() params: GetEntityByIdDto,
   ): Promise<UserResponse> {
@@ -39,6 +47,11 @@ export class UserController {
   }
 
   @Get()
+  @RequirePermissions(
+    [PermissionType.USERS, PermissionLevel.READ],
+    [PermissionType.ROLES, PermissionLevel.READ],
+    [PermissionType.PERMISSIONS, PermissionLevel.READ],
+  )
   public async getUsers(
     @Query() pagination: PaginationDto,
   ): Promise<Paginated<UserResponse>> {
@@ -46,11 +59,21 @@ export class UserController {
   }
 
   @Post()
+  @RequirePermissions(
+    [PermissionType.USERS, PermissionLevel.CREATE],
+    [PermissionType.ROLES, PermissionLevel.READ],
+    [PermissionType.PERMISSIONS, PermissionLevel.READ],
+  )
   public async createUser(@Body() body: CreateUserDto): Promise<UserResponse> {
     return this.gateway.create(body);
   }
 
   @Patch('/:id')
+  @RequirePermissions(
+    [PermissionType.USERS, PermissionLevel.FULL],
+    [PermissionType.ROLES, PermissionLevel.READ],
+    [PermissionType.PERMISSIONS, PermissionLevel.READ],
+  )
   public async updateUser(
     @Param() params: GetEntityByIdDto,
     @Body() body: UpdateUserDto,
@@ -59,6 +82,11 @@ export class UserController {
   }
 
   @Delete('/:id')
+  @RequirePermissions(
+    [PermissionType.USERS, PermissionLevel.FULL],
+    [PermissionType.ROLES, PermissionLevel.READ],
+    [PermissionType.PERMISSIONS, PermissionLevel.READ],
+  )
   public async deleteUser(
     @Param() params: GetEntityByIdDto,
   ): Promise<UserResponse> {

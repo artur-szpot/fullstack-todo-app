@@ -53,9 +53,11 @@ export class UserService implements UserGateway {
     pagination?: Pagination,
   ): Promise<Paginated<UserResponse>> {
     try {
-      const items = await this.userRepository.getManyUsers(pagination);
+      const [items, total] = await Promise.all([
+        this.userRepository.getManyUsers(pagination),
+        this.userRepository.getAllUsersCount(),
+      ]);
       const users = items.map(userMapper.fromDto.toDomain);
-      const total = await this.userRepository.getAllUsersCount();
       return {
         page: users.map(userMapper.fromDomain.toResponse),
         total,
@@ -70,7 +72,7 @@ export class UserService implements UserGateway {
     input: Partial<Pick<CreateUserDto, 'roles'>> | Pick<UpdateUserDto, 'roles'>,
   ): void {
     const { roles } = input;
-    if (!roles) {
+    if (!roles || roles.length === 1) {
       return;
     }
     const duplicateRoles = new Set();
@@ -97,7 +99,10 @@ export class UserService implements UserGateway {
     }
   }
 
-  private async ensureUniqueUsername(username: string): Promise<void> {
+  private async ensureUniqueUsername(username?: string): Promise<void> {
+    if (!username) {
+      return;
+    }
     if ((await this.userRepository.getUserByUsername(username)) !== null) {
       throw new BadRequestException(
         `User with username "${username}" already exists`,
@@ -114,14 +119,20 @@ export class UserService implements UserGateway {
 
   public async create(input: CreateUserDto): Promise<UserResponse> {
     this.ensureUniqueRoles(input);
-    this.ensureUniqueEmail(input.email);
-    this.ensureUniqueUsername(input.username);
 
     try {
+      await Promise.all([
+        this.ensureUniqueEmail(input.email),
+        this.ensureUniqueUsername(input.username),
+      ]);
+
       const userDto = await this.userRepository.createUser(input);
       const user = userMapper.fromDto.toDomain(userDto);
       return userMapper.fromDomain.toResponse(user);
     } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
       this.logger.error(`Unexpected error while creating user: ${error}`);
       throw new InternalError('creating the user');
     }
@@ -133,27 +144,36 @@ export class UserService implements UserGateway {
   ): Promise<UserResponse> {
     validateUpdateDtoNotEmpty(input);
     this.ensureUniqueRoles(input);
-    this.ensureUserExists(userId);
-    this.ensureUniqueUsername(input.username);
 
     try {
+      await Promise.all([
+        this.ensureUserExists(userId),
+        this.ensureUniqueUsername(input.username),
+      ]);
+
       const userDto = await this.userRepository.updateUser(userId, input);
       const user = userMapper.fromDto.toDomain(userDto);
       return userMapper.fromDomain.toResponse(user);
     } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
       this.logger.error(`Unexpected error while updating user: ${error}`);
       throw new InternalError('updating the user');
     }
   }
 
   public async delete(userId: string): Promise<UserResponse> {
-    this.ensureUserExists(userId);
-
     try {
+      await this.ensureUserExists(userId);
+
       const userDto = await this.userRepository.deleteUser(userId);
       const user = userMapper.fromDto.toDomain(userDto);
       return userMapper.fromDomain.toResponse(user);
     } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
       this.logger.error(`Unexpected error while deleting user: ${error}`);
       throw new InternalError('deleting the user');
     }

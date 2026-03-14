@@ -73,9 +73,11 @@ export class RoleService implements RoleGateway {
     pagination?: Pagination,
   ): Promise<Paginated<RoleResponse>> {
     try {
-      const items = await this.roleRepository.getManyRoles(pagination);
+      const [items, total] = await Promise.all([
+        this.roleRepository.getManyRoles(pagination),
+        this.roleRepository.getAllRolesCount(),
+      ]);
       const roles = items.map(roleMapper.fromDto.toDomain);
-      const total = await this.roleRepository.getAllRolesCount();
       return {
         page: roles.map(roleMapper.fromDomain.toResponse),
         total,
@@ -106,7 +108,10 @@ export class RoleService implements RoleGateway {
     );
   }
 
-  private async ensureUniqueName(name: string): Promise<void> {
+  private async ensureUniqueName(name?: string): Promise<void> {
+    if (!name) {
+      return;
+    }
     if ((await this.roleRepository.getRoleByName(name)) !== null) {
       throw new BadRequestException(`Role with name "${name}" already exists`);
     }
@@ -128,13 +133,17 @@ export class RoleService implements RoleGateway {
 
   public async create(input: CreateRoleDto): Promise<RoleResponse> {
     this.ensureUniquePermissions(input.permissions);
-    this.ensureUniqueName(input.name);
 
     try {
+      await this.ensureUniqueName(input.name);
+
       const roleDto = await this.roleRepository.createRole(input);
       const role = roleMapper.fromDto.toDomain(roleDto);
       return roleMapper.fromDomain.toResponse(role);
     } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
       this.logger.error(`Unexpected error while creating role: ${error}`);
       throw new InternalError('creating the role');
     }
@@ -146,34 +155,36 @@ export class RoleService implements RoleGateway {
   ): Promise<RoleResponse> {
     validateUpdateDtoNotEmpty(input);
     this.ensureUniquePermissions(input.permissions);
-    this.ensureRoleExistsAndIsNotProtected(roleId);
 
-    if (
-      input.name &&
-      (await this.roleRepository.getRoleByName(input.name)) !== null
-    ) {
-      throw new BadRequestException(
-        `Role with name "${input.name}" already exists`,
-      );
-    }
     try {
+      await Promise.all([
+        this.ensureRoleExistsAndIsNotProtected(roleId),
+        this.ensureUniqueName(input.name),
+      ]);
+
       const roleDto = await this.roleRepository.updateRole(roleId, input);
       const role = roleMapper.fromDto.toDomain(roleDto);
       return roleMapper.fromDomain.toResponse(role);
     } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
       this.logger.error(`Unexpected error while updating role: ${error}`);
       throw new InternalError('updating the role');
     }
   }
 
   public async delete(roleId: string): Promise<RoleResponse> {
-    this.ensureRoleExistsAndIsNotProtected(roleId);
-
     try {
+      await this.ensureRoleExistsAndIsNotProtected(roleId);
+
       const roleDto = await this.roleRepository.deleteRole(roleId);
       const role = roleMapper.fromDto.toDomain(roleDto);
       return roleMapper.fromDomain.toResponse(role);
     } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
       this.logger.error(`Unexpected error while deleting role: ${error}`);
       throw new InternalError('deleting the role');
     }

@@ -34,6 +34,9 @@ export class PermissionService implements PermissionGateway {
       const permission = permissionMapper.fromDto.toDomain(permissionDto);
       return permissionMapper.fromDomain.toResponse(permission);
     } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw error;
+      }
       this.logger.error(
         `Unexpected error while retrieving permission with type "${permissionType}": ${error}`,
       );
@@ -45,10 +48,11 @@ export class PermissionService implements PermissionGateway {
     pagination?: Pagination,
   ): Promise<Paginated<PermissionResponse>> {
     try {
-      const items =
-        await this.permissionRepository.getManyPermissions(pagination);
+      const [items, total] = await Promise.all([
+        this.permissionRepository.getManyPermissions(pagination),
+        this.permissionRepository.getAllPermissionsCount(),
+      ]);
       const permissions = items.map(permissionMapper.fromDto.toDomain);
-      const total = await this.permissionRepository.getAllPermissionsCount();
       return {
         page: permissions.map(permissionMapper.fromDomain.toResponse),
         total,

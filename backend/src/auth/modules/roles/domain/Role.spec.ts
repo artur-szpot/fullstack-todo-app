@@ -1,3 +1,5 @@
+import { Logger } from '@nestjs/common';
+
 import { Permission } from '@auth/modules/permissions/domain/Permission';
 import { PermissionLevel } from '@auth/modules/permissions/enums/permission-level.enum';
 import { PermissionType } from '@auth/modules/permissions/enums/permission-type.enum';
@@ -8,6 +10,8 @@ import { roleMapper } from '../mappers/role.mapper';
 import { Role } from './Role';
 
 describe('Role', () => {
+  const logger = new Logger('RoleTest');
+
   it('should create a Role based on correct props without ID', async () => {
     const props = {
       description: 'text',
@@ -22,7 +26,7 @@ describe('Role', () => {
         },
       ],
     };
-    const entity = new Role(props);
+    const entity = new Role(logger, props);
     expect(entity).toBeDefined();
     expect(entity).toBeInstanceOf(Role);
     expect(entity.toString()).toEqual(`Role "${props.name}"`);
@@ -30,7 +34,7 @@ describe('Role', () => {
       id: 'mocked-id',
       ...props,
       permissions: props.permissions.map(
-        (permission) => new Permission(permission),
+        (permission) => new Permission(logger, permission),
       ),
     });
   });
@@ -50,14 +54,14 @@ describe('Role', () => {
         },
       ],
     };
-    const entity = new Role(props);
+    const entity = new Role(logger, props);
     expect(entity).toBeDefined();
     expect(entity).toBeInstanceOf(Role);
     expect(entity.toString()).toEqual(`Role "${props.name}"`);
     expect(entity.getProps()).toEqual({
       ...props,
       permissions: props.permissions.map(
-        (permission) => new Permission(permission),
+        (permission) => new Permission(logger, permission),
       ),
     });
   });
@@ -70,7 +74,6 @@ describe('Role', () => {
       protectedRole: false,
       permissions: [
         {
-          id: '2',
           description: 'text',
           permissionLevel: PermissionLevel.CREATE,
           permissionType: PermissionType.TODOS,
@@ -84,7 +87,7 @@ describe('Role', () => {
     expect(entity.getProps()).toEqual({
       ...dto,
       permissions: dto.permissions.map(
-        (permission) => new Permission(permission),
+        (permission) => new Permission(logger, permission),
       ),
     });
   });
@@ -105,7 +108,7 @@ describe('Role', () => {
       ],
     };
     try {
-      new Role(props);
+      new Role(logger, props);
       // Fail test if this doesn't throw
       expect(true).toBe(false);
     } catch (error) {
@@ -128,7 +131,7 @@ describe('Role', () => {
       ],
     };
     try {
-      new Role(props);
+      new Role(logger, props);
       // Fail test if this doesn't throw
       expect(true).toBe(false);
     } catch (error) {

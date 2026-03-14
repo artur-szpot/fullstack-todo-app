@@ -8,6 +8,8 @@ import * as bcrypt from 'bcrypt';
 import { UserDto } from '@auth/modules/users/dto/in/user.dto';
 import { UserRepository } from '@db/repositories/user.repository';
 
+import { PermissionLevel } from '@auth/modules/permissions/enums/permission-level.enum';
+import { PermissionType } from '@auth/modules/permissions/enums/permission-type.enum';
 import { LoginDto } from '../dto/in/login.dto';
 import { AuthService } from './auth.service';
 
@@ -38,7 +40,13 @@ describe('AuthService', () => {
         description: 'text',
         name: 'test role',
         protectedRole: true,
-        permissions: [],
+        permissions: [
+          {
+            description: 'text',
+            permissionType: PermissionType.PERMISSIONS,
+            permissionLevel: PermissionLevel.FULL,
+          },
+        ],
       },
     ],
   };
