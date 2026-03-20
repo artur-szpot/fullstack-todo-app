@@ -38,8 +38,8 @@ TODO: Detailed instructions on how to set it up.
 
 This is a work in progress. A lot is left to be done still.
 
-- Full READMEs
-- Much of backend (see backend/README.md)
-- Whole frontend
-- DB: potential changes to data structure, more test data to seed
-- Docker instructions
+- Full READMEs, incl. instructions of running the project
+- Move these todos into the app itself
+- Refresh JWT token, make token itself short-lived
+- OAuth
+- Cookies?

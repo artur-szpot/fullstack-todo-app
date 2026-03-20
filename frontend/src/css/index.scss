@@ -7,11 +7,89 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+a {
+  text-decoration: none;
+  color: black;
+
+  &:hover {
+    text-shadow: 0 0 2px violet;
+  }
+}
+
+div#root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }
 
 div.navbar {
   width: 100%;
   background-color: plum;
+  display: flex;
+  flex-grow: 0;
+
+  div.logo {
+    img {
+      height: 50px;
+      width: auto;
+    }
+    flex-grow: 1;
+  }
+
+  a {
+    flex-grow: 0;
+    align-self: center;
+    margin: 0 1em;
+  }
+}
+
+div.main-container {
+  flex-grow: 1;
+  background-color: #370142;
+  color: white;
+  padding: 0.8em;
+}
+
+div.footer {
+  flex-grow: 0;
+  background-color: plum;
+  padding: 0 0.8em;
+  display: flex;
+
+  p {
+    flex-grow: 1;
+  }
+
+  a {
+    flex-grow: 0;
+    align-self: center;
+    &:not(:last-child) {
+      margin: 0 1em;
+    }
+    svg:hover {
+      color: #370142;
+    }
+  }
+}
+
+div.admin-nav {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+
+  a {
+    color: plum;
+    align-self: center;
+    padding: 0.1em 0.5em;
+    border-radius: 5px;
+
+    &.active {
+      background-color: #66027a;
+    }
+  }
+
+  h3 {
+    margin: 0;
+    align-self: center;
+  }
 }
