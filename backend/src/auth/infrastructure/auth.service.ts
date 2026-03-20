@@ -57,7 +57,7 @@ export class AuthService implements AuthGateway {
         permissions: user.getPermissions(),
       };
       return {
-        access_token: this.jwtService.sign(payload, {
+        accessToken: this.jwtService.sign(payload, {
           secret: process.env.AUTH_SECRET,
         }),
       };

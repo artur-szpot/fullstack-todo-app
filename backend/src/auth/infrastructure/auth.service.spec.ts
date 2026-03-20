@@ -66,7 +66,7 @@ describe('AuthService', () => {
       loginDto.email,
     );
     expect(mockJwtService.sign).toHaveBeenCalledTimes(1);
-    expect(result).toStrictEqual({ access_token: 'token' });
+    expect(result).toStrictEqual({ accessToken: 'token' });
   });
 
   it('should return generic error if wrong password given', async () => {
