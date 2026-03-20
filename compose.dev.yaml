@@ -20,6 +20,8 @@ services:
     build:
       context: frontend
       dockerfile: Dockerfile.dev
+    env_file:
+      - ./secrets/frontend.env
     ports:
       - 3002:5173
     develop:
@@ -30,7 +32,7 @@ services:
           ignore:
             - node_modules/
         - action: rebuild
-          path: package.json
+          path: ./frontend/package.json
 
   db:
     image: postgres:17

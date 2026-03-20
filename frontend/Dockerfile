@@ -1,5 +1,7 @@
 FROM node:22 AS builder
 
+ARG VITE_API_URL
+
 COPY package.json package-lock.json ./
 RUN npm ci && npm cache clean --force
 

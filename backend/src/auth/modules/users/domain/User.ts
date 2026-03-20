@@ -50,6 +50,7 @@ export class User extends Entity<UserPropsType> {
     const decoded = UserProps.decode(input);
     if (isLeft(decoded)) {
       logger.error(`Incorrect props received: ${JSON.stringify(input)}`);
+      logger.error(`Incorrect props received: ${typeof input['joinedDate']}`);
       throw new IncorrectEntityProps(PathReporter.report(decoded).join('\n'));
     }
     const decodedProps: UserPropsInputType = decoded.right;

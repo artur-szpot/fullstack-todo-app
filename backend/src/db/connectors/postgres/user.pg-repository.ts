@@ -63,7 +63,7 @@ export class PostgresUserRepository implements UserRepository {
       GROUP BY rp.role_id
    ) role_permissions_helper 
       ON role_permissions_helper.role_id = r.id
-   GROUP BY u.id, u.username, u.password, u.email;
+   GROUP BY u.id, u.username, u.password, u.email, u.joined_date;
   `;
 
   private SELECT_USERS_COUNT_SQL: string = `SELECT COUNT(*) AS total FROM users;`;

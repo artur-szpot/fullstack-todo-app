@@ -17,7 +17,7 @@ export const userMapper = {
         username: dto.username,
         password: dto.password,
         roles: dto.roles,
-        joinedDate: dto.joinedDate,
+        joinedDate: `${dto.joinedDate}`,
         lastLogin: dto.lastLogin,
       });
     },

@@ -12,6 +12,8 @@ services:
   frontend:
     build:
       context: frontend
+    env_file:
+      - ./secrets/frontend.env
     ports:
       - 3002:80
 
