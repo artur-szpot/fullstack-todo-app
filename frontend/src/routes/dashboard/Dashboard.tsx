@@ -1,5 +1,5 @@
-import { selectAccessToken } from "../store/features/currentUserSlice"
-import { useAppSelector } from "../store/hooks"
+import { selectAccessToken } from "../../store/features/currentUserSlice"
+import { useAppSelector } from "../../store/hooks"
 
 export const Dashboard = () => {
   const accessToken = useAppSelector(selectAccessToken)
