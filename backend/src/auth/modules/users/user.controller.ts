@@ -25,6 +25,7 @@ import { CreateUserDto } from './dto/in/create-user.dto';
 import { UpdateUserDto } from './dto/in/update-user.dto';
 import { UserResponse } from './dto/out/user.response';
 import { USER_GATEWAY, UserGateway } from './infrastructure/user.gateway';
+import { UserId } from '@common/decorators/user-id.decorator';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard, PermisionsGuard)
@@ -33,6 +34,13 @@ export class UserController {
     @Inject(USER_GATEWAY)
     private readonly gateway: UserGateway,
   ) {}
+
+  @Get('/me')
+  public async getLoggedInUser(
+    @UserId() userId: string,
+  ): Promise<UserResponse> {
+    return this.gateway.getById(userId);
+  }
 
   @Get('/:id')
   @RequirePermissions(
